@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Aaazj/mcenter/apps/code"
 	"github.com/Aaazj/mcenter/apps/token"
 )
 
@@ -18,17 +17,11 @@ type Issuer interface {
 	Init() error
 	GrantType() token.GRANT_TYPE
 	TokenIssuer
-	CodeIssuer
 }
 
 // 访问令牌颁发器
 type TokenIssuer interface {
 	IssueToken(context.Context, *token.IssueTokenRequest) (*token.Token, error)
-}
-
-// 验证码颁发器
-type CodeIssuer interface {
-	IssueCode(context.Context, *code.IssueCodeRequest) (*code.Code, error)
 }
 
 // 注册令牌颁发器
@@ -37,14 +30,6 @@ func Registe(i Issuer) {
 }
 
 func GetTokenIssuer(gt token.GRANT_TYPE) TokenIssuer {
-	if v, ok := m[gt]; ok {
-		return v
-	}
-
-	return nil
-}
-
-func GetCodeIssuer(gt token.GRANT_TYPE) CodeIssuer {
 	if v, ok := m[gt]; ok {
 		return v
 	}

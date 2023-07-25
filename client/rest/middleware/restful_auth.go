@@ -11,7 +11,7 @@ import (
 	"github.com/infraboard/mcube/logger/zap"
 
 	"github.com/Aaazj/mcenter/apps/endpoint"
-	"github.com/Aaazj/mcenter/apps/policy"
+	//"github.com/Aaazj/mcenter/apps/policy"
 	"github.com/Aaazj/mcenter/apps/service"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/user"
@@ -76,7 +76,7 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 
 		// 是不是需要返回用户的认证信息: 那个人, 那个空间下面， token本身的信息
 		req.SetAttribute(token.TOKEN_ATTRIBUTE_NAME, tk)
-
+		fmt.Printf("\"333333\": %v\n", "333333")
 		if entry.PermissionEnable {
 			// 权限检查
 			err := a.CheckPermission(req, tk, entry)
@@ -126,23 +126,23 @@ func (a *httpAuther) ValidatePermissionByACL(r *restful.Request, tk *token.Token
 }
 
 func (a *httpAuther) ValidatePermissionByPRBAC(r *restful.Request, tk *token.Token, e *endpoint.Entry) error {
-	svr, err := a.getService(r.Request.Context())
-	if err != nil {
-		return err
-	}
+	// svr, err := a.getService(r.Request.Context())
+	// if err != nil {
+	// 	return err
+	// }
 
-	req := policy.NewCheckPermissionRequest()
-	req.Username = tk.Username
-	req.Namespace = tk.Namespace
-	req.ServiceId = svr.Meta.Id
-	req.Path = e.UniquePath()
-	perm, err := a.client.Policy().CheckPermission(r.Request.Context(), req)
-	if err != nil {
-		return exception.NewPermissionDeny(err.Error())
-	}
-	a.log.Debugf("[%s] permission check passed", tk.Username)
-	// 保存访问访问信息
-	r.SetAttribute(policy.SCOPE_ATTRIBUTE_NAME, perm.Scope)
+	// req := policy.NewCheckPermissionRequest()
+	// req.Username = tk.Username
+	// req.Namespace = tk.Namespace
+	// req.ServiceId = svr.Meta.Id
+	// req.Path = e.UniquePath()
+	// perm, err := a.client.Policy().CheckPermission(r.Request.Context(), req)
+	// if err != nil {
+	// 	return exception.NewPermissionDeny(err.Error())
+	// }
+	// a.log.Debugf("[%s] permission check passed", tk.Username)
+	// // 保存访问访问信息
+	// r.SetAttribute(policy.SCOPE_ATTRIBUTE_NAME, perm.Scope)
 	return nil
 }
 

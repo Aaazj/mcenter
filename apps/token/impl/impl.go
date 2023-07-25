@@ -12,9 +12,8 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"google.golang.org/grpc"
 
-	"github.com/Aaazj/mcenter/apps/code"
 	"github.com/Aaazj/mcenter/apps/namespace"
-	"github.com/Aaazj/mcenter/apps/policy"
+	//"github.com/Aaazj/mcenter/apps/policy"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/token/provider"
 	"github.com/Aaazj/mcenter/apps/token/security"
@@ -33,10 +32,9 @@ type service struct {
 	token.UnimplementedRPCServer
 	log logger.Logger
 
-	policy  policy.Service
+	//policy  policy.Service
 	ns      namespace.Service
 	checker security.Checker
-	code    code.Service
 }
 
 func (s *service) Config() error {
@@ -64,9 +62,8 @@ func (s *service) Config() error {
 	s.col = dc
 
 	s.log = zap.L().Named(s.Name())
-	s.code = app.GetInternalApp(code.AppName).(code.Service)
 	s.ns = app.GetInternalApp(namespace.AppName).(namespace.Service)
-	s.policy = app.GetInternalApp(policy.AppName).(policy.Service)
+	//s.policy = app.GetInternalApp(policy.AppName).(policy.Service)
 
 	s.checker, err = security.NewChecker()
 	if err != nil {

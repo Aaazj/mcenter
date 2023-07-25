@@ -93,7 +93,7 @@ type deleteNamespaceRequest struct {
 func (r *deleteNamespaceRequest) FindFilter() bson.M {
 	filter := bson.M{
 		"domain": r.Domain,
-		"_id":    r.Name,
+		"name":   r.Name,
 	}
 
 	return filter

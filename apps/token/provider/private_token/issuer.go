@@ -3,7 +3,6 @@ package private_token
 import (
 	"context"
 
-	"github.com/Aaazj/mcenter/apps/code"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/token/provider"
 	"github.com/Aaazj/mcenter/apps/user"
@@ -64,21 +63,6 @@ func (i *issuer) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (
 	newTk.UserId = u.Meta.Id
 
 	return newTk, nil
-}
-
-func (i *issuer) IssueCode(ctx context.Context, req *code.IssueCodeRequest) (*code.Code, error) {
-	_, err := i.validate(ctx, req.AccessToken)
-	if err != nil {
-		return nil, err
-	}
-
-	// 颁发Token
-	c, err := code.NewCode(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
 }
 
 func init() {

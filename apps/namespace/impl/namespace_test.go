@@ -11,9 +11,9 @@ func TestCreateNamespace(t *testing.T) {
 	req := namespace.NewCreateNamespaceRequest()
 	// req.Domain = domain.DEFAULT_DOMAIN
 	// req.Name = namespace.DEFAULT_NAMESPACE
-	req.Domain = "chenggui"
-	req.Name = "default"
-	req.Owner = "chengguiuser1"
+	//req.Domain = "chenggui"
+	req.Name = "cg"
+	//req.Owner = "chengguiuser1"
 	r, err := impl.CreateNamespace(ctx, req)
 	if err != nil {
 		t.Fatal(err)

@@ -4,12 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/Aaazj/mcenter/apps/code"
-	"github.com/Aaazj/mcenter/apps/policy"
+	//"github.com/Aaazj/mcenter/apps/policy"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/token/provider"
 	"github.com/infraboard/mcube/exception"
-	"github.com/infraboard/mcube/http/request"
 )
 
 func (s *service) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (
@@ -89,32 +87,32 @@ func (s *service) BeforeLoginSecurityCheck(ctx context.Context, req *token.Issue
 	return nil
 }
 
-func (s *service) AfterLoginSecurityCheck(ctx context.Context, verifyCode string, tk *token.Token) error {
-	// 如果有校验码, 则直接通过校验码检测用户身份安全
-	if verifyCode != "" {
-		s.log.Debugf("verify code provided, check code ...")
-		_, err := s.code.VerifyCode(ctx, code.NewVerifyCodeRequest(tk.Username, verifyCode))
-		if err != nil {
-			return exception.NewPermissionDeny("verify code invalidate, error, %s", err)
-		}
-		s.log.Debugf("verfiy code check passed")
-		return nil
-	}
+// func (s *service) AfterLoginSecurityCheck(ctx context.Context, verifyCode string, tk *token.Token) error {
+// 	// 如果有校验码, 则直接通过校验码检测用户身份安全
+// 	if verifyCode != "" {
+// 		s.log.Debugf("verify code provided, check code ...")
+// 		_, err := s.code.VerifyCode(ctx, code.NewVerifyCodeRequest(tk.Username, verifyCode))
+// 		if err != nil {
+// 			return exception.NewPermissionDeny("verify code invalidate, error, %s", err)
+// 		}
+// 		s.log.Debugf("verfiy code check passed")
+// 		return nil
+// 	}
 
-	// 异地登录检测
-	err := s.checker.OtherPlaceLoggedInChecK(ctx, tk)
-	if err != nil {
-		return exception.NewVerifyCodeRequiredError("异地登录检测失败: %s", err)
-	}
+// 	// 异地登录检测
+// 	err := s.checker.OtherPlaceLoggedInChecK(ctx, tk)
+// 	if err != nil {
+// 		return exception.NewVerifyCodeRequiredError("异地登录检测失败: %s", err)
+// 	}
 
-	// 长时间未登录检测
-	err = s.checker.NotLoginDaysChecK(ctx, tk)
-	if err != nil {
-		return exception.NewVerifyCodeRequiredError("长时间未登录检测失败: %s", err)
-	}
+// 	// 长时间未登录检测
+// 	err = s.checker.NotLoginDaysChecK(ctx, tk)
+// 	if err != nil {
+// 		return exception.NewVerifyCodeRequiredError("长时间未登录检测失败: %s", err)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (s *service) RestoreUserState(ctx context.Context, tk *token.Token) error {
 	qt := token.NewQueryTokenRequest()
@@ -248,17 +246,17 @@ func (s *service) DescribeToken(ctx context.Context, req *token.DescribeTokenReq
 		return nil, exception.NewUnauthorized(err.Error())
 	}
 
-	// 查询用户可以访问的空间
-	query := policy.NewQueryPolicyRequest()
-	query.Page = request.NewPageRequest(policy.MAX_USER_POLICY, 1)
-	query.Username = tk.Username
-	ps, err := s.policy.QueryPolicy(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	if ps.Total > policy.MAX_USER_POLICY {
-		s.log.Warnf("user policy large than max policy count %d, total: %d", policy.MAX_USER_POLICY, ps.Total)
-	}
-	tk.AvailableNamespace = ps.GetNamespace()
+	// // 查询用户可以访问的空间
+	// query := policy.NewQueryPolicyRequest()
+	// query.Page = request.NewPageRequest(policy.MAX_USER_POLICY, 1)
+	// query.Username = tk.Username
+	// ps, err := s.policy.QueryPolicy(ctx, query)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if ps.Total > policy.MAX_USER_POLICY {
+	// 	s.log.Warnf("user policy large than max policy count %d, total: %d", policy.MAX_USER_POLICY, ps.Total)
+	// }
+	// tk.AvailableNamespace = ps.GetNamespace()
 	return tk, nil
 }

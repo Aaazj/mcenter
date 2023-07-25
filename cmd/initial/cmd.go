@@ -30,9 +30,9 @@ var Cmd = &cobra.Command{
 		err = exec.InitNamespace(ctx)
 		cobra.CheckErr(err)
 
-		// 初始化内置角色
-		err = exec.InitRole(ctx)
-		cobra.CheckErr(err)
+		// // 初始化内置角色
+		// err = exec.InitRole(ctx)
+		// cobra.CheckErr(err)
 
 		// 初始化内置服务
 		err = exec.InitService(ctx)

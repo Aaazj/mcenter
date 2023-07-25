@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/Aaazj/mcenter/apps/code"
 	"github.com/Aaazj/mcenter/apps/domain"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/token/provider"
@@ -95,21 +94,6 @@ func (i *issuer) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (
 	tk.RefreshExpiredAt = time.Now().Add(time.Duration(token.DEFAULT_REFRESH_TOKEN_EXPIRE_SECOND)*time.Second).Unix() * 1000
 
 	return tk, nil
-}
-
-func (i *issuer) IssueCode(ctx context.Context, req *code.IssueCodeRequest) (*code.Code, error) {
-	_, err := i.validate(ctx, req.Username, req.Password)
-	if err != nil {
-		return nil, err
-	}
-
-	// 颁发Token
-	c, err := code.NewCode(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
 }
 
 func init() {

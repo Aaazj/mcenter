@@ -7,7 +7,8 @@ import (
 
 	"github.com/Aaazj/mcenter/apps/domain"
 	"github.com/Aaazj/mcenter/apps/namespace"
-	"github.com/Aaazj/mcenter/apps/role"
+
+	//"github.com/Aaazj/mcenter/apps/role"
 	"github.com/Aaazj/mcenter/apps/service"
 	"github.com/AlecAivazis/survey/v2"
 
@@ -94,9 +95,9 @@ func newExcutor() *excutor {
 	return &excutor{
 		domain:    app.GetInternalApp(domain.AppName).(domain.Service),
 		namespace: app.GetInternalApp(namespace.AppName).(namespace.Service),
-		role:      app.GetInternalApp(role.AppName).(role.Service),
-		user:      app.GetInternalApp(user.AppName).(user.Service),
-		service:   app.GetInternalApp(service.AppName).(service.MetaService),
+		//role:      app.GetInternalApp(role.AppName).(role.Service),
+		user:    app.GetInternalApp(user.AppName).(user.Service),
+		service: app.GetInternalApp(service.AppName).(service.MetaService),
 		//system:    app.GetInternalApp(setting.AppName).(setting.Service),
 	}
 }
@@ -108,7 +109,7 @@ type excutor struct {
 
 	domain    domain.Service
 	namespace namespace.Service
-	role      role.Service
+	//role      role.Service
 	//system    setting.Service
 	user    user.Service
 	service service.MetaService
@@ -143,30 +144,30 @@ func (e *excutor) InitNamespace(ctx context.Context) error {
 	return nil
 }
 
-func (e *excutor) InitRole(ctx context.Context) error {
-	req := role.CreateAdminRoleRequest(e.username)
-	r, err := e.role.CreateRole(ctx, req)
-	if err != nil {
-		return fmt.Errorf("初始化角色失败: %s", err)
-	}
-	fmt.Printf("初始化角色: %15s [成功]", r.Spec.Name)
-	fmt.Println()
+// func (e *excutor) InitRole(ctx context.Context) error {
+// 	req := role.CreateAdminRoleRequest(e.username)
+// 	r, err := e.role.CreateRole(ctx, req)
+// 	if err != nil {
+// 		return fmt.Errorf("初始化角色失败: %s", err)
+// 	}
+// 	fmt.Printf("初始化角色: %15s [成功]", r.Spec.Name)
+// 	fmt.Println()
 
-	req = role.CreateVisitorRoleRequest(e.username)
-	r, err = e.role.CreateRole(ctx, req)
-	if err != nil {
-		return fmt.Errorf("初始化角色失败: %s", err)
-	}
-	fmt.Printf("初始化角色: %15s [成功]", r.Spec.Name)
-	fmt.Println()
-	return nil
-}
+// 	req = role.CreateVisitorRoleRequest(e.username)
+// 	r, err = e.role.CreateRole(ctx, req)
+// 	if err != nil {
+// 		return fmt.Errorf("初始化角色失败: %s", err)
+// 	}
+// 	fmt.Printf("初始化角色: %15s [成功]", r.Spec.Name)
+// 	fmt.Println()
+// 	return nil
+// }
 
 func (e *excutor) InitService(ctx context.Context) error {
 	apps := NewInitApps()
-	apps.Add("maudit", "审计中心")
-	apps.Add("mpaas", "发布中心")
-	apps.Add("moperator", "发布中心")
+	//apps.Add("maudit", "审计中心")
+	//apps.Add("mpaas", "发布中心")
+	//apps.Add("moperator", "发布中心")
 	apps.Add("cmdb", "资源中心")
 
 	for _, req := range apps.items {

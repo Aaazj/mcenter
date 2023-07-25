@@ -9,14 +9,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/Aaazj/mcenter/apps/code"
 	"github.com/Aaazj/mcenter/apps/endpoint"
 	"github.com/Aaazj/mcenter/apps/instance"
 	"github.com/Aaazj/mcenter/apps/namespace"
 
-	//"github.com/Aaazj/mcenter/apps/notify"
-	"github.com/Aaazj/mcenter/apps/policy"
-	"github.com/Aaazj/mcenter/apps/role"
+	//"github.com/Aaazj/mcenter/apps/policy"
+	//"github.com/Aaazj/mcenter/apps/role"
 	"github.com/Aaazj/mcenter/apps/service"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/user"
@@ -104,11 +102,6 @@ func (c *ClientSet) Token() token.RPCClient {
 	return token.NewRPCClient(c.conn)
 }
 
-// Code服务的SDK
-func (c *ClientSet) Code() code.RPCClient {
-	return code.NewRPCClient(c.conn)
-}
-
 // Namespace服务的SDK
 func (c *ClientSet) Namespace() namespace.RPCClient {
 	return namespace.NewRPCClient(c.conn)
@@ -125,14 +118,14 @@ func (c *ClientSet) User() user.RPCClient {
 // }
 
 // Role服务的SDK
-func (c *ClientSet) Role() role.RPCClient {
-	return role.NewRPCClient(c.conn)
-}
+// func (c *ClientSet) Role() role.RPCClient {
+// 	return role.NewRPCClient(c.conn)
+// }
 
-// Permission服务的SDK
-func (c *ClientSet) Policy() policy.RPCClient {
-	return policy.NewRPCClient(c.conn)
-}
+// // Permission服务的SDK
+// func (c *ClientSet) Policy() policy.RPCClient {
+// 	return policy.NewRPCClient(c.conn)
+// }
 
 // Endpoint服务的SDK
 func (c *ClientSet) Endpoint() endpoint.RPCClient {

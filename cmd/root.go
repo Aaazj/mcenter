@@ -9,7 +9,6 @@ import (
 	"github.com/Aaazj/mcenter/cmd/initial"
 	"github.com/Aaazj/mcenter/cmd/start"
 	"github.com/Aaazj/mcenter/conf"
-	"github.com/Aaazj/mcenter/tracer"
 	"github.com/Aaazj/mcenter/version"
 	"github.com/infraboard/mcube/app"
 	"github.com/infraboard/mcube/cache"
@@ -58,9 +57,9 @@ func initail() {
 	err = app.InitAllApp()
 	cobra.CheckErr(err)
 
-	// 初始化Tracer
-	err = tracer.InitTracer()
-	cobra.CheckErr(err)
+	// // 初始化Tracer
+	// err = tracer.InitTracer()
+	// cobra.CheckErr(err)
 }
 
 // config 为全局变量, 只需要load 即可全局可用户

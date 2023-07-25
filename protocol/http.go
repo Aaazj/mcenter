@@ -11,12 +11,12 @@ import (
 	"github.com/infraboard/mcube/app"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful"
 
+	//"github.com/Aaazj/mcenter/conf"
 	"github.com/Aaazj/mcenter/conf"
 	"github.com/Aaazj/mcenter/protocol/auth"
 	"github.com/Aaazj/mcenter/swagger"
-	"github.com/Aaazj/mcenter/version"
+	//"github.com/Aaazj/mcenter/swagger"
 )
 
 // NewHTTPService 构建函数
@@ -37,8 +37,8 @@ func NewHTTPService() *HTTPService {
 	}
 	r.Filter(cors.Filter)
 	// trace中间件
-	filter := otelrestful.OTelFilter(version.ServiceName)
-	restful.DefaultContainer.Filter(filter)
+	// filter := otelrestful.OTelFilter(version.ServiceName)
+	// restful.DefaultContainer.Filter(filter)
 	// 添加鉴权中间件
 	r.Filter(auth.NewHttpAuther().GoRestfulAuthFunc)
 

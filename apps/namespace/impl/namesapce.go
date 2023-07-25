@@ -5,12 +5,11 @@ import (
 	"fmt"
 
 	"github.com/infraboard/mcube/exception"
-	"github.com/infraboard/mcube/http/request"
 	"github.com/infraboard/mcube/pb/resource"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/Aaazj/mcenter/apps/namespace"
-	"github.com/Aaazj/mcenter/apps/policy"
+	//"github.com/Aaazj/mcenter/apps/policy"
 )
 
 func (s *impl) CreateNamespace(ctx context.Context, req *namespace.CreateNamespaceRequest) (
@@ -18,14 +17,6 @@ func (s *impl) CreateNamespace(ctx context.Context, req *namespace.CreateNamespa
 	ins, err := s.newNamespace(ctx, req)
 	if err != nil {
 		return nil, err
-	}
-
-	if req.ParentId != "" {
-		c, err := s.counter.GetNextSequenceValue(req.ParentId)
-		if err != nil {
-			return nil, err
-		}
-		ins.Meta.Id = fmt.Sprintf("%s-%d", req.ParentId, c.Value)
 	}
 
 	if _, err := s.col.InsertOne(ctx, ins); err != nil {
@@ -41,20 +32,20 @@ func (s *impl) QueryNamespace(ctx context.Context, req *namespace.QueryNamespace
 	r := newPaggingQuery(req)
 	set := namespace.NewNamespaceSet()
 
-	if req.Username != "" {
-		qp := policy.NewQueryPolicyRequest()
-		qp.Page = request.NewPageRequest(policy.MAX_USER_POLICY, 1)
-		qp.Domain = req.Domain
-		qp.Username = req.Username
-		ps, err := s.policy.QueryPolicy(ctx, qp)
-		if err != nil {
-			return nil, err
-		}
-		nss, total := ps.GetNamespaceWithPage(req.Page)
-		r.AddNamespace(nss)
-		set.Total = total
-		return set, nil
-	}
+	// if req.Username != "" {
+	// 	qp := policy.NewQueryPolicyRequest()
+	// 	qp.Page = request.NewPageRequest(policy.MAX_USER_POLICY, 1)
+	// 	qp.Domain = req.Domain
+	// 	qp.Username = req.Username
+	// 	ps, err := s.policy.QueryPolicy(ctx, qp)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	nss, total := ps.GetNamespaceWithPage(req.Page)
+	// 	r.AddNamespace(nss)
+	// 	set.Total = total
+	// 	return set, nil
+	// }
 
 	resp, err := s.col.Find(ctx, r.FindFilter(), r.FindOptions())
 	if err != nil {
@@ -104,6 +95,7 @@ func (s *impl) DescribeNamespace(ctx context.Context, req *namespace.DescriptNam
 
 func (s *impl) DeleteNamespace(ctx context.Context, req *namespace.DeleteNamespaceRequest) (*namespace.Namespace, error) {
 	ns, err := s.DescribeNamespace(ctx, namespace.NewDescriptNamespaceRequest(req.Domain, req.Name))
+	fmt.Printf("ns: %v\n", ns)
 	if err != nil {
 		return nil, err
 	}
@@ -118,11 +110,11 @@ func (s *impl) DeleteNamespace(ctx context.Context, req *namespace.DeleteNamespa
 		return nil, exception.NewInternalServerError("delete namespace(%s) error, %s", req.Name, err)
 	}
 
-	// 清除空间管理的所有策略
-	_, err = s.policy.DeletePolicy(ctx, policy.NewDeletePolicyRequestWithNamespace(req.Domain, req.Name))
-	if err != nil {
-		s.log.Errorf("delete namespace policy error, %s", err)
-	}
+	// // 清除空间管理的所有策略
+	// _, err = s.policy.DeletePolicy(ctx, policy.NewDeletePolicyRequestWithNamespace(req.Domain, req.Name))
+	// if err != nil {
+	// 	s.log.Errorf("delete namespace policy error, %s", err)
+	// }
 
 	return ns, nil
 }

@@ -52,8 +52,16 @@ func NewCreateNamespaceRequest() *CreateNamespaceRequest {
 }
 
 func (req *CreateNamespaceRequest) UpdateOwner(tk *token.Token) {
-	req.Owner = tk.Username
-	req.Domain = tk.Domain
+
+	if tk == nil {
+		return
+	}
+	fmt.Printf("req.Owner: %v\n", req.Owner)
+	// 默认Owner是自己
+	if req.Owner == "" {
+		req.Owner = tk.Username
+	}
+
 }
 
 // Validate todo
@@ -115,10 +123,18 @@ func (req *DescriptNamespaceRequest) Validate() error {
 	return nil
 }
 
-// NewDeleteNamespaceRequestWithID todo
-func NewDeleteNamespaceRequest(name string) *DeleteNamespaceRequest {
+func NewDeleteNamespaceRequestFromHTTP(r *http.Request) *DeleteNamespaceRequest {
+	qs := r.URL.Query()
 	return &DeleteNamespaceRequest{
-		Name: name,
+		Name: qs.Get("name"),
+	}
+}
+
+// NewDeleteNamespaceRequestWithID todo
+func NewDeleteNamespaceRequest(domain, name string) *DeleteNamespaceRequest {
+	return &DeleteNamespaceRequest{
+		Domain: domain,
+		Name:   name,
 	}
 }
 
