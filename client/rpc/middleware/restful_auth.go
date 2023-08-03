@@ -2,13 +2,17 @@ package middleware
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/exception"
+	"github.com/infraboard/mcube/http/label"
+	"github.com/infraboard/mcube/http/request"
 	"github.com/infraboard/mcube/http/restful/response"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
 
+	"github.com/Aaazj/mcenter/apps/audit"
 	"github.com/Aaazj/mcenter/apps/endpoint"
 
 	"github.com/Aaazj/mcenter/apps/token"
@@ -74,8 +78,44 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 
 	}
 
+	start := time.Now()
+
 	// next flow
 	next.ProcessFilter(req, resp)
+
+	cost := time.Now().Sub(start).Milliseconds()
+	//开启审计
+	//Metadata(label.Audit, label.Enable)
+	if entry != nil && entry.AuthEnable && entry.AuditLog {
+
+		tk := req.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
+		auditReq := audit.NewOperateLog(tk.Username, "", "")
+
+		auditReq.Url = req.Request.URL.String()
+		auditReq.Cost = cost
+		auditReq.StatusCode = int64(resp.StatusCode())
+		auditReq.UserAgent = req.Request.UserAgent()
+		// X-Forwar-For
+		auditReq.RemoteIp = request.GetRemoteIP(req.Request)
+
+		meta := req.SelectedRoute().Metadata()
+
+		if meta != nil {
+			if v, ok := meta[label.Resource]; ok {
+				auditReq.Resource, _ = v.(string)
+			}
+			if v, ok := meta[label.Action]; ok {
+				auditReq.Action, _ = v.(string)
+			}
+		}
+
+		_, err := a.client.Audit().AuditOperate(req.Request.Context(), auditReq)
+		if err != nil {
+			a.log.Warnf("audit operate failed, %s", err)
+			return
+		}
+
+	}
 }
 
 func (a *httpAuther) CheckAccessToken(req *restful.Request) (*token.Token, error) {

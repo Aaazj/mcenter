@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package infraboard.mcenter.namespace;
+package mcenter.namespace;
 option go_package = "github.com/Aaazj/mcenter/apps/namespace";
 
 import "page/page.proto";

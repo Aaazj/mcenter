@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package mcenter.audit;
+option go_package = "github.com/Aaazj/mcenter/apps/audit";
+
+//通过RPC来鉴权
+service RPC {
+    rpc AuditOperate(OperateLog) returns(AuditOperateLogResponse); 
+}
+
+// 操作日志
+message OperateLog {
+    // 谁
+    // @gotags: json:"username" bson:"username"
+    string username = 1;
+    // 什么时候
+    // @gotags: json:"when" bson:"when"
+    int64 when = 2;
+    // 对个服务
+    // @gotags: json:"service" bson:"service"
+    string service = 3;
+    // 对那种资源
+    // @gotags: json:"resource" bson:"resource"
+    string resource = 4;
+    // 对那种资源
+    // @gotags: json:"action" bson:"action"
+    string action = 5;
+    // 请求参数, URL部分
+    // @gotags: json:"url" bson:"url"
+    string url = 6;
+    // 请求参数, body部分
+    // @gotags: json:"request" bson:"request"
+    string request = 7;
+    // 请求响应
+    // @gotags: json:"response" bson:"response"
+    string response = 8;
+    // 调用时间
+    // @gotags: json:"cost" bson:"cost"
+    int64 cost = 9;
+    // 状态码
+    // @gotags: json:"status_code" bson:"status_code"
+    int64 status_code = 10;
+    // 状态码
+    // @gotags: json:"user_agent" bson:"user_agent"
+    string user_agent = 11;
+    // 状态码
+    // @gotags: json:"remote_ip" bson:"remote_ip"
+    string remote_ip = 12;
+    // 其他信息
+    // @gotags: json:"meta" bson:"meta"
+    map<string,string> meta = 13;
+}
+
+message AuditOperateLogResponse {}

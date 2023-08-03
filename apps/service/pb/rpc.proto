@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package infraboard.mcenter.service;
+package mcenter.service;
 option go_package = "github.com/Aaazj/mcenter/apps/service";
 
 import "page/page.proto";

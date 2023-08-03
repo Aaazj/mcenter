@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package infraboard.mcenter.user;
+package mcenter.user;
 option go_package = "github.com/Aaazj/mcenter/apps/user";
 
 message Password {

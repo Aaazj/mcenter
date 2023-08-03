@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.23.1
-// source: mcenter/apps/token/pb/rpc.proto
+// source: mcenter/apps/audit/pb/audit.proto
 
-package token
+package audit
 
 import (
 	context "context"
@@ -19,15 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RPC_ValidateToken_FullMethodName = "/mcenter.token.RPC/ValidateToken"
+	RPC_AuditOperate_FullMethodName = "/mcenter.audit.RPC/AuditOperate"
 )
 
 // RPCClient is the client API for RPC service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RPCClient interface {
-	// 校验Token
-	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*Token, error)
+	AuditOperate(ctx context.Context, in *OperateLog, opts ...grpc.CallOption) (*AuditOperateLogResponse, error)
 }
 
 type rPCClient struct {
@@ -38,9 +37,9 @@ func NewRPCClient(cc grpc.ClientConnInterface) RPCClient {
 	return &rPCClient{cc}
 }
 
-func (c *rPCClient) ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*Token, error) {
-	out := new(Token)
-	err := c.cc.Invoke(ctx, RPC_ValidateToken_FullMethodName, in, out, opts...)
+func (c *rPCClient) AuditOperate(ctx context.Context, in *OperateLog, opts ...grpc.CallOption) (*AuditOperateLogResponse, error) {
+	out := new(AuditOperateLogResponse)
+	err := c.cc.Invoke(ctx, RPC_AuditOperate_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +50,7 @@ func (c *rPCClient) ValidateToken(ctx context.Context, in *ValidateTokenRequest,
 // All implementations must embed UnimplementedRPCServer
 // for forward compatibility
 type RPCServer interface {
-	// 校验Token
-	ValidateToken(context.Context, *ValidateTokenRequest) (*Token, error)
+	AuditOperate(context.Context, *OperateLog) (*AuditOperateLogResponse, error)
 	mustEmbedUnimplementedRPCServer()
 }
 
@@ -60,8 +58,8 @@ type RPCServer interface {
 type UnimplementedRPCServer struct {
 }
 
-func (UnimplementedRPCServer) ValidateToken(context.Context, *ValidateTokenRequest) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
+func (UnimplementedRPCServer) AuditOperate(context.Context, *OperateLog) (*AuditOperateLogResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuditOperate not implemented")
 }
 func (UnimplementedRPCServer) mustEmbedUnimplementedRPCServer() {}
 
@@ -76,20 +74,20 @@ func RegisterRPCServer(s grpc.ServiceRegistrar, srv RPCServer) {
 	s.RegisterService(&RPC_ServiceDesc, srv)
 }
 
-func _RPC_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ValidateTokenRequest)
+func _RPC_AuditOperate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OperateLog)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RPCServer).ValidateToken(ctx, in)
+		return srv.(RPCServer).AuditOperate(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: RPC_ValidateToken_FullMethodName,
+		FullMethod: RPC_AuditOperate_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RPCServer).ValidateToken(ctx, req.(*ValidateTokenRequest))
+		return srv.(RPCServer).AuditOperate(ctx, req.(*OperateLog))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -98,14 +96,14 @@ func _RPC_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(i
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RPC_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "mcenter.token.RPC",
+	ServiceName: "mcenter.audit.RPC",
 	HandlerType: (*RPCServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ValidateToken",
-			Handler:    _RPC_ValidateToken_Handler,
+			MethodName: "AuditOperate",
+			Handler:    _RPC_AuditOperate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "mcenter/apps/token/pb/rpc.proto",
+	Metadata: "mcenter/apps/audit/pb/audit.proto",
 }

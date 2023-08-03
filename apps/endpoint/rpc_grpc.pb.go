@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RPC_DescribeEndpoint_FullMethodName = "/infraboard.mcenter.endpoint.RPC/DescribeEndpoint"
-	RPC_QueryEndpoints_FullMethodName   = "/infraboard.mcenter.endpoint.RPC/QueryEndpoints"
-	RPC_RegistryEndpoint_FullMethodName = "/infraboard.mcenter.endpoint.RPC/RegistryEndpoint"
+	RPC_DescribeEndpoint_FullMethodName = "/mcenter.endpoint.RPC/DescribeEndpoint"
+	RPC_QueryEndpoints_FullMethodName   = "/mcenter.endpoint.RPC/QueryEndpoints"
+	RPC_RegistryEndpoint_FullMethodName = "/mcenter.endpoint.RPC/RegistryEndpoint"
 )
 
 // RPCClient is the client API for RPC service.
@@ -162,7 +162,7 @@ func _RPC_RegistryEndpoint_Handler(srv interface{}, ctx context.Context, dec fun
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RPC_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "infraboard.mcenter.endpoint.RPC",
+	ServiceName: "mcenter.endpoint.RPC",
 	HandlerType: (*RPCServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

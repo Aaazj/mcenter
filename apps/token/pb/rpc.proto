@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package infraboard.mcenter.token;
+package mcenter.token;
 option go_package = "github.com/Aaazj/mcenter/apps/token";
 
 import "page/page.proto";

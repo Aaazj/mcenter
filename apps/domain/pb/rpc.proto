@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package infraboard.mcenter.domain;
+package mcenter.domain;
 option go_package = "github.com/Aaazj/mcenter/apps/domain";
 
 import "page/page.proto";

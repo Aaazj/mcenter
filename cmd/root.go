@@ -123,10 +123,13 @@ func loadCache() error {
 	l := zap.L().Named("INIT")
 	c := conf.C()
 	// 设置全局缓存
+	fmt.Printf("c.Cache.Type: %v\n", c.Cache.Type)
 	switch c.Cache.Type {
+
 	case "memory", "":
 		ins := memory.NewCache(c.Cache.Memory)
 		cache.SetGlobal(ins)
+		fmt.Printf("\"use cache in local memory\": %v\n", "use cache in local memory")
 		l.Info("use cache in local memory")
 	case "redis":
 		ins := redis.NewCache(c.Cache.Redis)

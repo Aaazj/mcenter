@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/Aaazj/mcenter/apps/audit"
 	"github.com/Aaazj/mcenter/apps/endpoint"
 	"github.com/Aaazj/mcenter/apps/instance"
 	"github.com/Aaazj/mcenter/apps/namespace"
@@ -130,4 +131,9 @@ func (c *ClientSet) User() user.RPCClient {
 // Endpoint服务的SDK
 func (c *ClientSet) Endpoint() endpoint.RPCClient {
 	return endpoint.NewRPCClient(c.conn)
+}
+
+// Audit服务的SDK
+func (c *ClientSet) Audit() audit.RPCClient {
+	return audit.NewRPCClient(c.conn)
 }

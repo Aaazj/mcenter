@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package infraboard.mcenter.label;
+package mcenter.label;
 option go_package = "github.com/Aaazj/mcenter/apps/label";
 
 // Note:

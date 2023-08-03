@@ -1,6 +1,10 @@
 package conf
 
 import (
+	"fmt"
+	"net"
+	"strings"
+
 	"github.com/BurntSushi/toml"
 	"github.com/caarlos0/env/v6"
 )
@@ -23,6 +27,13 @@ func LoadConfigFromToml(filePath string) error {
 	if _, err := toml.DecodeFile(filePath, cfg); err != nil {
 		return err
 	}
+
+	// hostip := getLocalIP()
+	// if hostip != "" {
+	// 	cfg.App.HTTP.Host = hostip
+	// }
+	fmt.Printf("cfg.App.HTTP.Host: %v\n", cfg.App.HTTP.Host)
+	fmt.Printf("\"sssssssssssssssssssssssssssssssssssssssss\": %v\n", "sssssssssssssssssssssssssssssssssssssssss")
 	// 加载全局配置单例
 	global = cfg
 	return nil
@@ -37,4 +48,19 @@ func LoadConfigFromEnv() error {
 	// 加载全局配置单例
 	global = cfg
 	return nil
+}
+
+func getLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		fmt.Printf(fmt.Errorf("Failed to get local IP address: %v", err).Error())
+	}
+	for _, addr := range addrs {
+		ipNet, ok := addr.(*net.IPNet)
+		if ok && !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil && strings.HasPrefix(ipNet.IP.String(), "10.2.") {
+			return ipNet.IP.String()
+		}
+	}
+	fmt.Printf(fmt.Errorf("Failed to get local IP address: no matching IP address found").Error())
+	return ""
 }

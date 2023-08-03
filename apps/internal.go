@@ -20,6 +20,7 @@ import (
 	//_ "github.com/Aaazj/mcenter/apps/policy/impl"
 	_ "github.com/Aaazj/mcenter/apps/resource/impl"
 	//_ "github.com/Aaazj/mcenter/apps/role/impl"
+	_ "github.com/Aaazj/mcenter/apps/audit/impl"
 	_ "github.com/Aaazj/mcenter/apps/service/impl"
 	_ "github.com/Aaazj/mcenter/apps/token/impl"
 	_ "github.com/Aaazj/mcenter/apps/user/impl"

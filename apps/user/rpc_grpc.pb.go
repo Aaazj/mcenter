@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RPC_QueryUser_FullMethodName    = "/infraboard.mcenter.user.RPC/QueryUser"
-	RPC_DescribeUser_FullMethodName = "/infraboard.mcenter.user.RPC/DescribeUser"
+	RPC_QueryUser_FullMethodName    = "/mcenter.user.RPC/QueryUser"
+	RPC_DescribeUser_FullMethodName = "/mcenter.user.RPC/DescribeUser"
 )
 
 // RPCClient is the client API for RPC service.
@@ -133,7 +133,7 @@ func _RPC_DescribeUser_Handler(srv interface{}, ctx context.Context, dec func(in
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RPC_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "infraboard.mcenter.user.RPC",
+	ServiceName: "mcenter.user.RPC",
 	HandlerType: (*RPCServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
