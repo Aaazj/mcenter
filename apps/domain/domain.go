@@ -36,7 +36,7 @@ func New(req *CreateDomainRequest) (*Domain, error) {
 		Meta: resource.NewMeta(),
 		Spec: req,
 	}
-
+	//d.Meta.Id = req.Name
 	return d, nil
 }
 
@@ -95,7 +95,7 @@ func NewDefaultLoginSecurity() *LoginSecurity {
 		RetryLock: true,
 		RetryLockConfig: &RetryLockConfig{
 			RetryLimite:  5,
-			LockedMinite: 30,
+			LockedMinite: 1,
 		},
 		IpLimite: false,
 		IpLimiteConfig: &IPLimiteConfig{

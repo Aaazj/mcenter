@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package mcenter.device;
+option go_package = "github.com/Aaazj/mcenter/apps/device";
+
+
+
+
+
+// Endpoint Service's features
+message Device {
+    
+    // @gotags: bson:"_id" json:"id" validate:"required,lte=64"
+    string id = 1;
+    // 创建时间
+    // @gotags: bson:"create_at" json:"create_at,omitempty"
+    int64 create_at = 2;
+    // 创建日期
+    // @gotags: bson:",create_date" json:"create_date,omitempty" 
+    string create_date = 3;
+    
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 4;
+    // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 5;
+
+    // 设备条目信息
+    // @gotags: bson:",inline" json:"entry" validate:"required"
+    DeviceEntry entry = 6;
+    // 剩余时间
+    // @gotags: bson:",remaining_days" json:"remaining_days,omitempty" 
+    int64 remaining_days = 7;
+   
+}
+
+
+
+
+
+
+// Entry 条目
+message DeviceEntry {
+
+
+    // 资源名称
+    // @gotags: bson:"name" json:"name"
+    string name =1;
+
+    // 设备分配时间
+    // @gotags: bson:"allocate_days" json:"allocate_days"
+    int64 AllocateDays =2;
+
+}
+
+
+message DeviceSet {
+    // @gotags: bson:"total" json:"total"
+    int64 total = 1;
+    // @gotags: bson:"items" json:"items"
+    repeated Device items = 2;
+}
+
+
+
+
+

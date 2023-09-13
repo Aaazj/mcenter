@@ -29,6 +29,7 @@ func NewHTTPService() *HTTPService {
 
 	// CORS中间件
 	cors := restful.CrossOriginResourceSharing{
+		ExposeHeaders:  []string{"*"},
 		AllowedHeaders: []string{"*"},
 		AllowedDomains: []string{"*"},
 		AllowedMethods: []string{"HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"},

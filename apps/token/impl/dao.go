@@ -78,9 +78,36 @@ func (s *service) blockOtherWebToken(ctx context.Context, tk *token.Token) error
 	return nil
 }
 
+func (s *service) blockToken(ctx context.Context, tk *token.Token) (*token.Token, error) {
+
+	now := time.Now()
+	status := token.NewStatus()
+	status.IsBlock = true
+	status.BlockAt = now.UnixMilli()
+	status.BlockReason = fmt.Sprintf("你于 %s 注销下线", now.Format(time.RFC3339))
+	status.BlockType = token.BLOCK_TYPE_LOGGED_OUT
+	tk.Status = status
+	rs, err := s.col.UpdateMany(
+		ctx,
+		bson.M{
+			"platform":        token.PLATFORM_WEB,
+			"user_id":         tk.UserId,
+			"issue_at":        bson.M{"$eq": tk.IssueAt},
+			"status.is_block": false,
+		},
+		bson.M{"$set": bson.M{"status": status}},
+	)
+	if err != nil {
+		return nil, err
+	}
+	s.log.Debugf("block %d tokens", rs.ModifiedCount)
+
+	return tk, nil
+}
+
 func (s *service) DeleteSomeToken(ctx context.Context, tk *token.Token) error {
 	qt := token.NewQueryTokenRequest()
-	qt.Page.PageSize = 20
+	qt.Page.PageSize = 200
 	qt.Platform = token.NewPlatform(token.PLATFORM_WEB)
 	qt.UserId = tk.UserId
 	qt.Username = tk.Username
@@ -92,9 +119,9 @@ func (s *service) DeleteSomeToken(ctx context.Context, tk *token.Token) error {
 		return nil
 	}
 
-	if set.Length() > 5 {
+	if set.Length() > 100 {
 		for idx, val := range set.Items {
-			if idx > 4 {
+			if idx > 100 {
 				err := s.delete(ctx, val)
 
 				if err != nil {

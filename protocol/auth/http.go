@@ -8,6 +8,7 @@ import (
 	"github.com/Aaazj/mcenter/apps/endpoint"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/user"
+	"github.com/Aaazj/mcenter/conf"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/app"
 	"github.com/infraboard/mcube/cache"
@@ -15,6 +16,7 @@ import (
 	"github.com/infraboard/mcube/http/restful/response"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
+	"k8s.io/klog/v2"
 )
 
 func NewHttpAuther() *httpAuther {
@@ -39,6 +41,12 @@ func (a *httpAuther) SetCodeCheckSilenceTime(t time.Duration) {
 }
 
 func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Response, next *restful.FilterChain) {
+
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
 	// 请求拦截
 	entry := endpoint.NewEntryFromRestRequest(req)
 	fmt.Printf("\"11111111111111111111111111111111111\": %v\n", "11111111111111111111111111111111111")
@@ -47,7 +55,13 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 		// 访问令牌校验
 		tk, err := a.CheckAccessToken(req)
 		if err != nil {
-			response.Failed(resp, err)
+			//response.Failed(resp, err)
+			res.Errcode = 401001
+			res.Errmsg = err.Error()
+			klog.V(4).Info(res)
+			if err := resp.WriteAsJson(res); err != nil {
+				klog.Error(err)
+			}
 			return
 		}
 
@@ -66,11 +80,11 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 func (a *httpAuther) CheckAccessToken(req *restful.Request) (*token.Token, error) {
 	// 获取用户Token, Token放在Heander Authorization
 	ak := token.GetAccessTokenFromHTTP(req.Request)
-
+	fmt.Printf("aaaaaaak: %v\n", ak)
 	if ak == "" {
 		return nil, token.ErrUnauthorized
 	}
-
+	fmt.Printf("ak: %v\n", ak)
 	// 调用GRPC 校验用户Token合法性
 	tk, err := a.tk.ValidateToken(req.Request.Context(), token.NewValidateTokenRequest(ak))
 	if err != nil {

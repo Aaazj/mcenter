@@ -10,9 +10,11 @@ import (
 	"github.com/infraboard/mcube/http/restful/response"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
+	"k8s.io/klog/v2"
 
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/user"
+	"github.com/Aaazj/mcenter/conf"
 )
 
 // 主账号用户管理接口
@@ -86,7 +88,7 @@ func (h *primary) Registry(ws *restful.WebService) {
 		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
 		Metadata(restfulspec.KeyOpenAPITags, tags))
 
-	ws.Route(ws.POST("/{id}/password").To(h.ResetPassword).
+	ws.Route(ws.POST("/password/{id}").To(h.ResetPassword).
 		Metadata(label.Auth, true).
 		Metadata(label.Allow, user.TYPE_PRIMARY).
 		Doc("重置子账号密码").
@@ -95,21 +97,41 @@ func (h *primary) Registry(ws *restful.WebService) {
 }
 
 func (h *primary) CreateUser(r *restful.Request, w *restful.Response) {
+
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
 	req := user.NewCreateUserRequest()
 
 	if err := r.ReadEntity(req); err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+
+		res.Errcode = 401001
+		res.Errmsg = "读取账户创建信息失败:" + err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
-	fmt.Printf("req.Type: %v\n", req.Type)
-	fmt.Printf("req.Domain11111: %v\n", req.Domain)
+
 	tk := r.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
 	fmt.Printf("tk: %v\n", tk)
 	if tk.UserType != user.TYPE_SUPPER {
 		fmt.Printf("int32(req.Type): %v\n", int32(req.Type))
 		//没有权限创建超级管理员
 		if user.TYPE_name[int32(req.Type)] == "SUPPER" || user.TYPE_name[int32(req.Type)] == "PRIMARY" {
-			response.Failed(w, fmt.Errorf("no permission, allow: SUPPER , but current: PRIMARY"))
+
+			res.Errcode = 401002
+			res.Errmsg = "no permission, allow: SUPPER , but current: PRIMARY"
+			klog.V(4).Info(res)
+			if err := w.WriteAsJson(res); err != nil {
+				klog.Error(err)
+			}
+
+			//response.Failed(w, fmt.Errorf("no permission, allow: SUPPER , but current: PRIMARY"))
 			return
 		}
 		req.Domain = tk.Domain
@@ -128,11 +150,20 @@ func (h *primary) CreateUser(r *restful.Request, w *restful.Response) {
 
 	set, err := h.service.CreateUser(r.Request.Context(), req)
 	if err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
-
-	response.Success(w, set)
+	res.Data = set
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+	//response.Success(w, set)
 }
 
 func (h *primary) PutUser(r *restful.Request, w *restful.Response) {
@@ -166,35 +197,80 @@ func (h *primary) PatchUser(r *restful.Request, w *restful.Response) {
 }
 
 func (h *primary) ResetPassword(r *restful.Request, w *restful.Response) {
+
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
 	req := user.NewResetPasswordRequest()
+	req.IsReset = true
+	req.UserId = r.PathParameter("id")
+
 	if err := r.ReadEntity(req); err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+		res.Errcode = 401001
+		res.Errmsg = "读取账户信息失败:" + err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
-	req.UserId = r.PathParameter("id")
 
 	set, err := h.service.ResetPassword(r.Request.Context(), req)
 	if err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
-	response.Success(w, set)
+	res.Data = set
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+	//response.Success(w, set)
 }
 
 func (h *primary) DeleteUser(r *restful.Request, w *restful.Response) {
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
 	req := user.NewDeleteUserRequest()
 	req.UserIds = append(req.UserIds, r.PathParameter("id"))
 
 	set, err := h.service.DeleteUser(r.Request.Context(), req)
 	if err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
-	response.Success(w, set)
+	res.Data = set
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+	//response.Success(w, set)
 }
 
 func (h *primary) QueryUser(r *restful.Request, w *restful.Response) {
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
 	req := user.NewQueryUserRequestFromHTTP(r.Request)
+	fmt.Printf("req: %v\n", req)
 
 	//6.9添加限制
 	tk := r.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
@@ -208,32 +284,63 @@ func (h *primary) QueryUser(r *restful.Request, w *restful.Response) {
 
 	ins, err := h.service.QueryUser(r.Request.Context(), req)
 	if err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
 
-	response.Success(w, ins)
+	res.Data = ins
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+	//response.Success(w, ins)
 }
 
 func (h *primary) DescribeUser(r *restful.Request, w *restful.Response) {
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
 	tk := r.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
 
 	req := user.NewDescriptUserRequestById(r.PathParameter("id"))
 
 	ins, err := h.service.DescribeUser(r.Request.Context(), req)
 	if err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
 
 	if tk.UserType != user.TYPE_SUPPER {
 		if ins.Spec.Domain != tk.Domain || ins.Spec.Namespace != tk.Namespace {
-			response.Failed(w, fmt.Errorf("no permission"))
+			//response.Failed(w, fmt.Errorf("no permission"))
+			res.Errcode = 401002
+			res.Errmsg = "no permission"
+			klog.V(4).Info(res)
+			if err := w.WriteAsJson(res); err != nil {
+				klog.Error(err)
+			}
 			return
 		}
 	}
 
-	response.Success(w, ins)
+	res.Data = ins
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+	//response.Success(w, ins)
 }
 
 func init() {

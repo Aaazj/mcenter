@@ -76,7 +76,9 @@ func (i *issuer) validate(ctx context.Context, username, pass string) (*user.Use
 }
 
 func (i *issuer) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (*token.Token, error) {
+
 	u, err := i.validate(ctx, req.Username, req.Password)
+
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +90,7 @@ func (i *issuer) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (
 	tk.Username = u.Spec.Username
 	tk.UserType = u.Spec.Type
 	tk.UserId = u.Meta.Id
+	tk.NeedReset = u.Password.NeedReset
 
 	tk.AccessExpiredAt = time.Now().Add(time.Duration(token.DEFAULT_ACCESS_TOKEN_EXPIRE_SECOND)*time.Second).Unix() * 1000
 

@@ -9,5 +9,6 @@ const (
 type Service interface {
 	CreateNamespace(context.Context, *CreateNamespaceRequest) (*Namespace, error)
 	DeleteNamespace(context.Context, *DeleteNamespaceRequest) (*Namespace, error)
+	UpdateNamespace(context.Context, *UpdateNamespaceRequest) (*Namespace, error)
 	RPCServer
 }

@@ -1,15 +1,19 @@
 package api
 
 import (
+	"fmt"
+
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/app"
 	"github.com/infraboard/mcube/http/label"
-	"github.com/infraboard/mcube/http/restful/response"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
+	"k8s.io/klog/v2"
 
+	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/user"
+	"github.com/Aaazj/mcenter/conf"
 )
 
 // 主账号用户管理接口
@@ -38,28 +42,49 @@ func (h *sub) Registry(ws *restful.WebService) {
 
 	ws.Route(ws.POST("/password").To(h.UpdatePassword).
 		Metadata(label.Auth, true).
-		Metadata(label.Allow, user.TYPE_SUB).
-		Doc("子账号修改自己密码").
+		//Metadata(label.Allow, user.TYPE_SUB).
+		Doc("账号修改自己密码").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads(user.UpdatePasswordRequest{}).
 		Returns(0, "OK", &user.User{}))
 }
 
 func (h *sub) UpdatePassword(r *restful.Request, w *restful.Response) {
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+	tk := r.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
+
 	req := user.NewUpdatePasswordRequest()
+	req.UserId = tk.UserId
+	fmt.Printf("req.UserId: %v\n", req.UserId)
 	if err := r.ReadEntity(req); err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+		res.Errmsg = "读取密码信息失败:" + err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
 
-	req.UserId = r.PathParameter("id")
 	set, err := h.service.UpdatePassword(r.Request.Context(), req)
 	if err != nil {
-		response.Failed(w, err)
+		//response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
-
-	response.Success(w, set)
+	res.Data = set
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+	//response.Success(w, set)
 }
 
 func init() {

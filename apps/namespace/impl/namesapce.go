@@ -3,9 +3,11 @@ package impl
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/infraboard/mcube/exception"
 	"github.com/infraboard/mcube/pb/resource"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/Aaazj/mcenter/apps/namespace"
@@ -95,7 +97,7 @@ func (s *impl) DescribeNamespace(ctx context.Context, req *namespace.DescriptNam
 
 func (s *impl) DeleteNamespace(ctx context.Context, req *namespace.DeleteNamespaceRequest) (*namespace.Namespace, error) {
 	ns, err := s.DescribeNamespace(ctx, namespace.NewDescriptNamespaceRequest(req.Domain, req.Name))
-	fmt.Printf("ns: %v\n", ns)
+
 	if err != nil {
 		return nil, err
 	}
@@ -129,6 +131,32 @@ func (s *impl) newNamespace(ctx context.Context, req *namespace.CreateNamespaceR
 		Meta: resource.NewMeta(),
 		Spec: req,
 	}
-
+	//ins.Meta.Id = req.Name
 	return ins, nil
+}
+
+func (s *impl) UpdateNamespace(ctx context.Context, req *namespace.UpdateNamespaceRequest) (
+	*namespace.Namespace, error) {
+	if req.Domain == "" || req.Name == "" {
+		return nil, fmt.Errorf("Domain or Name required")
+	}
+
+	var descReq *namespace.DescriptNamespaceRequest
+
+	descReq = namespace.NewDescriptNamespaceRequest(req.Domain, req.Name)
+
+	d, err := s.DescribeNamespace(ctx, descReq)
+	if err != nil {
+		return nil, err
+	}
+
+	d.Spec = req.Spec
+
+	d.Meta.UpdateAt = time.Now().Unix()
+	_, err = s.col.UpdateOne(ctx, bson.M{"_id": d.Meta.Id}, bson.M{"$set": d})
+	if err != nil {
+		return nil, exception.NewInternalServerError("update namespace(%s) error, %s", d.Meta.Id, err)
+	}
+
+	return d, nil
 }

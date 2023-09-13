@@ -231,3 +231,9 @@ func newJaeger() *jaeger {
 type jaeger struct {
 	Endpoint string `toml:"endpoint" json:"endpoint" yaml:"endpoint" env:"JAEGER_ENDPOINT"`
 }
+
+type GeneralResponse struct {
+	Errcode int         `json:"errcode"`
+	Errmsg  string      `json:"errmsg"`
+	Data    interface{} `json:"data"`
+}

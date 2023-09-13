@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	//"github.com/Aaazj/mcenter/apps/policy"
@@ -12,7 +13,8 @@ import (
 
 func (s *service) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (
 	*token.Token, error) {
-	// 登陆前安全检查
+
+	//登陆前安全检查
 	if err := s.BeforeLoginSecurityCheck(ctx, req); err != nil {
 		return nil, exception.NewBadRequest(err.Error())
 	}
@@ -55,7 +57,7 @@ func (s *service) IssueTokenNow(ctx context.Context, req *token.IssueTokenReques
 	// if tk.Namespace == "" {
 	// 	s.setDefaultNamespace(ctx, tk)
 	// }
-
+	fmt.Printf("\"bbbbb\": %v\n", "bbbbb")
 	if !req.DryRun {
 		// 入库保存
 		if err := s.save(ctx, tk); err != nil {
@@ -72,11 +74,12 @@ func (s *service) IssueTokenNow(ctx context.Context, req *token.IssueTokenReques
 }
 
 func (s *service) BeforeLoginSecurityCheck(ctx context.Context, req *token.IssueTokenRequest) error {
+	fmt.Printf("\"bbbbbbbb\": %v\n", "bbbbbbbb")
 	// 连续登录失败检测
 	if err := s.checker.MaxFailedRetryCheck(ctx, req); err != nil {
 		return exception.NewBadRequest("%s", err)
 	}
-
+	fmt.Printf("\"exceptionexceptionexceptionexception\": %v\n", "exceptionexceptionexceptionexception")
 	// IP保护检测
 	// err := s.checker.IPProtectCheck(ctx, req)
 	// if err != nil {
@@ -144,10 +147,14 @@ func (s *service) RevolkToken(ctx context.Context, req *token.RevolkTokenRequest
 	if tk.RefreshToken != req.RefreshToken {
 		return nil, exception.NewBadRequest("refresh token not correct")
 	}
-
-	if err := s.delete(ctx, tk); err != nil {
+	// 关闭web登录
+	tk, err = s.blockToken(ctx, tk)
+	if err != nil {
 		return nil, err
 	}
+	// if err := s.delete(ctx, tk); err != nil {
+	// 	return nil, err
+	// }
 	return tk, nil
 }
 
@@ -186,6 +193,9 @@ func (s *service) makeBlockExcption(bt token.BLOCK_TYPE, message string) excepti
 		return exception.NewOtherPlaceLoggedIn(message)
 	case token.BLOCK_TYPE_OTHER_IP_LOGGED_IN:
 		return exception.NewOtherIPLoggedIn(message)
+	case token.BLOCK_TYPE_LOGGED_OUT:
+		return exception.NewSessionTerminated(message)
+
 	default:
 		return exception.NewInternalServerError("unknow block type: %s, message: %s", bt, message)
 	}

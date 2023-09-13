@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Aaazj/mcenter/apps/domain"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/common/format"
 	"github.com/go-playground/validator/v10"
 	request "github.com/infraboard/mcube/http/request"
+	pb_request "github.com/infraboard/mcube/pb/request"
 	resource "github.com/infraboard/mcube/pb/resource"
 )
 
@@ -48,7 +50,9 @@ func (n *Namespace) ToJson() string {
 
 // NewCreateNamespaceRequest todo
 func NewCreateNamespaceRequest() *CreateNamespaceRequest {
-	return &CreateNamespaceRequest{}
+	return &CreateNamespaceRequest{
+		Domain: domain.DEFAULT_DOMAIN,
+	}
 }
 
 func (req *CreateNamespaceRequest) UpdateOwner(tk *token.Token) {
@@ -145,4 +149,14 @@ func (req *DeleteNamespaceRequest) Validate() error {
 	}
 
 	return nil
+}
+
+// NewPutNamespaceRequest new实例
+func NewPutNamespaceRequest(domain, name string) *UpdateNamespaceRequest {
+	return &UpdateNamespaceRequest{
+		Domain:     domain,
+		Name:       name,
+		UpdateMode: pb_request.UpdateMode_PUT,
+		Spec:       &CreateNamespaceRequest{},
+	}
 }

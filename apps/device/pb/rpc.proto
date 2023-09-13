@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package mcenter.device;
+option go_package = "github.com/Aaazj/mcenter/apps/device";
+
+import "page/page.proto";
+import "mcenter/apps/device/pb/device.proto";
+
+// RPC endpoint管理
+service RPC {
+	rpc DescribeDevice(DescribeDeviceRequest) returns(Device);
+	rpc QueryDevice(QueryDeviceRequest) returns(DeviceSet);
+	rpc AllocationDevice(AllocationRequest) returns(DeviceSet);
+    rpc ReleaseDevices(ReleaseDevicesRequest) returns(DeviceSet);
+    rpc ValidateDevice(ValidateDeviceRequest) returns(Device);
+    rpc QueryDeviceByNamespace(QueryDeviceByNamespaceRequest) returns(DeviceByNamespaceSet);
+}
+
+
+message QueryDeviceByNamespaceRequest{
+       // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 1;
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 2;
+}
+  
+message DeviceByNamespaceSet {
+    // @gotags: bson:"items" json:"items"
+    repeated string items = 1;
+}
+
+
+
+
+
+
+message AllocationRequest{
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 1;
+    // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 2;
+
+     // @gotags: json:"entries"
+    repeated DeviceEntry entries = 3;
+}
+
+message AllocationResponse{
+    // @gotags: json:"message"
+    string message = 1;
+}
+
+// DescribeEndpointRequest todo
+message DescribeDeviceRequest {
+      // 名称
+    // @gotags: json:"name"
+    string name = 1;
+
+}
+
+
+message QueryDeviceRequest {
+    // @gotags: json:"page"
+    infraboard.mcube.page.PageRequest page = 1;
+     // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 2;
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 3;
+}
+
+
+
+
+message ReleaseDevicesRequest{
+
+     // @gotags: json:"names"
+    repeated string names = 1;
+}
+
+
+message ValidateDeviceRequest{
+
+     // @gotags: json:"name"
+    string name = 1;
+}

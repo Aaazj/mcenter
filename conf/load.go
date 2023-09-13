@@ -32,8 +32,8 @@ func LoadConfigFromToml(filePath string) error {
 	// if hostip != "" {
 	// 	cfg.App.HTTP.Host = hostip
 	// }
-	fmt.Printf("cfg.App.HTTP.Host: %v\n", cfg.App.HTTP.Host)
-	fmt.Printf("\"sssssssssssssssssssssssssssssssssssssssss\": %v\n", "sssssssssssssssssssssssssssssssssssssssss")
+	//fmt.Printf("cfg.App.HTTP.Host: %v\n", cfg.App.HTTP.Host)
+	//fmt.Printf("\"sssssssssssssssssssssssssssssssssssssssss\": %v\n", "sssssssssssssssssssssssssssssssssssssssss")
 	// 加载全局配置单例
 	global = cfg
 	return nil

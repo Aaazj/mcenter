@@ -70,6 +70,13 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Returns(200, "OK", namespace.NamespaceSet{}).
 		Returns(404, "Not Found", nil))
 
+	ws.Route(ws.PUT("/{d_id}/{id}").To(h.PutNamespace).
+		Metadata(label.Auth, true).
+		Metadata(label.Allow, user.TYPE_SUPPER).
+		Doc("修改子账号").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Reads(namespace.CreateNamespaceRequest{}))
+
 }
 
 func init() {

@@ -12,6 +12,7 @@ import (
 	_ "github.com/Aaazj/mcenter/apps/service/api"
 
 	//_ "github.com/Aaazj/mcenter/apps/setting/api"
+	_ "github.com/Aaazj/mcenter/apps/device/api"
 	_ "github.com/Aaazj/mcenter/apps/namespace/api"
 	_ "github.com/Aaazj/mcenter/apps/token/api"
 	_ "github.com/Aaazj/mcenter/apps/user/api"

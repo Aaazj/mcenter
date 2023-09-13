@@ -37,6 +37,8 @@ enum BLOCK_TYPE {
     OTHER_PLACE_LOGGED_IN = 1;
     // 异常Ip登陆
     OTHER_IP_LOGGED_IN = 2;
+    //注销下线
+    LOGGED_OUT = 3;
 }
 
 enum PLATFORM {
@@ -104,6 +106,10 @@ message Token {
     // 其他信息
     // @gotags: bson:"meta" json:"meta,omitempty"
     map<string,string> meta = 19;
+
+    // 密码需要被重置
+    // @gotags: bson:"need_reset" json:"need_reset"
+    bool need_reset = 20;
 }
 
 message Status {

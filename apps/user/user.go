@@ -51,7 +51,7 @@ func New(req *CreateUserRequest) (*User, error) {
 			Locked:        false,
 		},
 	}
-	u.Meta.Id = req.Username
+	//u.Meta.Id = req.Username
 	if req.UseFullNamed {
 		u.MakeFullNamedUid()
 	} else {

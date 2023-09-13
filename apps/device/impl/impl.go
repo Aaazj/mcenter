@@ -12,9 +12,8 @@ import (
 	"github.com/infraboard/mcube/logger/zap"
 	"google.golang.org/grpc"
 
-	"github.com/Aaazj/mcenter/apps/namespace"
-	//"github.com/Aaazj/mcenter/apps/policy"
-	//"github.com/Aaazj/mcenter/apps/role"
+	"github.com/Aaazj/mcenter/apps/device"
+
 	"github.com/Aaazj/mcenter/conf"
 )
 
@@ -26,10 +25,7 @@ var (
 type impl struct {
 	col *mongo.Collection
 	log logger.Logger
-	namespace.UnimplementedRPCServer
-
-	//role   role.Service
-	//policy policy.Service
+	device.UnimplementedRPCServer
 }
 
 func (i *impl) Config() error {
@@ -59,17 +55,16 @@ func (i *impl) Config() error {
 	}
 
 	i.col = dc
-	//i.role = app.GetInternalApp(role.AppName).(role.Service)
-	//i.policy = app.GetInternalApp(policy.AppName).(policy.Service)
+
 	return nil
 }
 
 func (i *impl) Name() string {
-	return namespace.AppName
+	return device.AppName
 }
 
 func (i *impl) Registry(server *grpc.Server) {
-	namespace.RegisterRPCServer(server, svr)
+	device.RegisterRPCServer(server, svr)
 }
 
 func init() {
