@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/Aaazj/mcenter/apps/audit"
+	"github.com/Aaazj/mcenter/apps/device"
 	"github.com/Aaazj/mcenter/apps/endpoint"
 	"github.com/Aaazj/mcenter/apps/instance"
 	"github.com/Aaazj/mcenter/apps/namespace"
@@ -111,6 +112,11 @@ func (c *ClientSet) Namespace() namespace.RPCClient {
 // User服务的SDK
 func (c *ClientSet) User() user.RPCClient {
 	return user.NewRPCClient(c.conn)
+}
+
+// Device服务的SDK
+func (c *ClientSet) Device() device.RPCClient {
+	return device.NewRPCClient(c.conn)
 }
 
 // // Notify服务的SDK
