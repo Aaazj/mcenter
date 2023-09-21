@@ -256,6 +256,11 @@ func (t *Token) CheckRefreshIsExpired() bool {
 	return time.Unix(t.RefreshExpiredAt/1000, 0).Before(time.Now())
 }
 
+func (t *Token) Desense() *Token {
+	t.RefreshToken = ""
+	return t
+}
+
 func (t *Token) JsonFormat() string {
 	dj, err := json.Marshal(t)
 	if err != nil {

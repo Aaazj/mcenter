@@ -131,7 +131,7 @@ func (s *impl) newNamespace(ctx context.Context, req *namespace.CreateNamespaceR
 		Meta: resource.NewMeta(),
 		Spec: req,
 	}
-	//ins.Meta.Id = req.Name
+
 	return ins, nil
 }
 

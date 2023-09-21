@@ -47,10 +47,12 @@ message DeviceEntry {
     // 资源名称
     // @gotags: bson:"name" json:"name"
     string name =1;
-
+    // 资源ID
+    // @gotags: id:"name" json:"id"
+    string id =2;
     // 设备分配时间
     // @gotags: bson:"allocate_days" json:"allocate_days"
-    int64 AllocateDays =2;
+    int64 AllocateDays =3;
 
 }
 

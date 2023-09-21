@@ -182,7 +182,7 @@ func (s *service) ValidateToken(ctx context.Context, req *token.ValidateTokenReq
 		}
 	}
 
-	return tk, nil
+	return tk.Desense(), nil
 }
 
 func (s *service) makeBlockExcption(bt token.BLOCK_TYPE, message string) exception.APIException {

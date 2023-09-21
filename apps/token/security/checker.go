@@ -44,7 +44,7 @@ type checker struct {
 
 func (c *checker) MaxFailedRetryCheck(ctx context.Context, req *token.IssueTokenRequest) error {
 	ss := c.getOrDefaultSecuritySettingWithUser(ctx, req.Username)
-	fmt.Printf("\"ffffffffffffffffff\": %v\n", "ffffffffffffffffff")
+	fmt.Printf("\"aaaaaaaaaaaaaffffffffffffffffff\": %v\n", "ffffffffffffffffff")
 	fmt.Printf("ss: %v\n", ss)
 	if !ss.LoginSecurity.RetryLock {
 		c.log.Debugf("retry lock check disabled, don't check")
