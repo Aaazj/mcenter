@@ -91,7 +91,7 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 		tk := req.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
 		auditReq := audit.NewOperateLog(tk.Username, "", "")
 
-		auditReq.Url = req.Request.URL.String()
+		auditReq.Url = req.Request.Method + " " + req.Request.URL.String()
 		auditReq.Cost = cost
 		auditReq.StatusCode = int64(resp.StatusCode())
 		auditReq.UserAgent = req.Request.UserAgent()

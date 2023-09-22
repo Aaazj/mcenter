@@ -95,11 +95,6 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 
 		auditReq.Id = xid.New().String()
 		auditReq.Url = req.Request.Method + " " + req.Request.URL.String()
-		fmt.Printf("req.Request: %v\n", req.Request)
-		fmt.Printf("req.Request.Proto: %v\n", req.Request.Proto)
-
-		fmt.Printf("resp.ResponseWriter: %v\n", resp.ResponseWriter)
-		fmt.Printf("resp.ResponseWriter.Header(): %v\n", resp.ResponseWriter.Header())
 
 		auditReq.Cost = cost
 		auditReq.StatusCode = int64(resp.StatusCode())
@@ -118,7 +113,7 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 				auditReq.Action, _ = v.(string)
 			}
 		}
-		fmt.Printf("\"aaaaaa\": %v\n", "aaaaaa")
+
 		_, err := a.audit.AuditOperate(req.Request.Context(), auditReq)
 		if err != nil {
 			a.log.Warnf("audit operate failed, %s", err)
