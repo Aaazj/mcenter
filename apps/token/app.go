@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Aaazj/mcenter/conf"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/go-playground/validator/v10"
 	"github.com/infraboard/mcube/http/request"
@@ -321,7 +322,7 @@ func (m *TokenSet) JsonFormat() string {
 
 func NewQueryTokenRequest() *QueryTokenRequest {
 	return &QueryTokenRequest{
-		Page: request.NewDefaultPageRequest(),
+		Page: request.NewPageRequest(conf.DEFAULT_PAGE_SIZE, 1),
 	}
 }
 

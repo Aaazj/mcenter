@@ -1,4 +1,4 @@
-package all
+package apps
 
 import (
 	// 注册所有HTTP服务模块, 暴露给框架HTTP服务器加载
@@ -12,6 +12,7 @@ import (
 	_ "github.com/Aaazj/mcenter/apps/service/api"
 
 	//_ "github.com/Aaazj/mcenter/apps/setting/api"
+	_ "github.com/Aaazj/mcenter/apps/audit/api"
 	_ "github.com/Aaazj/mcenter/apps/device/api"
 	_ "github.com/Aaazj/mcenter/apps/namespace/api"
 	_ "github.com/Aaazj/mcenter/apps/token/api"

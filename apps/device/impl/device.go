@@ -47,7 +47,7 @@ func (s *impl) DescribeDevice(ctx context.Context, req *device.DescribeDeviceReq
 func (s *impl) QueryDevice(ctx context.Context, req *device.QueryDeviceRequest) (
 	*device.DeviceSet, error) {
 	r := newQueryRequest(req)
-	fmt.Printf("r: %v\n", r)
+
 	resp, err := s.col.Find(ctx, r.FindFilter(), r.FindOptions())
 	if err != nil {
 		return nil, exception.NewInternalServerError("find device error, error is %s", err)

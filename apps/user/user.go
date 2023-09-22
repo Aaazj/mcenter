@@ -9,6 +9,7 @@ import (
 
 	"github.com/Aaazj/mcenter/apps/domain"
 	"github.com/Aaazj/mcenter/common/format"
+	"github.com/Aaazj/mcenter/conf"
 	"github.com/go-playground/validator/v10"
 	"github.com/imdario/mergo"
 	"github.com/infraboard/mcube/exception"
@@ -51,7 +52,7 @@ func New(req *CreateUserRequest) (*User, error) {
 			Locked:        false,
 		},
 	}
-	//u.Meta.Id = req.Username
+
 	if req.UseFullNamed {
 		u.MakeFullNamedUid()
 	} else {
@@ -115,7 +116,7 @@ func NewQueryUserRequestFromHTTP(r *http.Request) *QueryUserRequest {
 // NewQueryUserRequest 列表查询请求
 func NewQueryUserRequest() *QueryUserRequest {
 	return &QueryUserRequest{
-		Page:      request.NewPageRequest(20, 1),
+		Page:      request.NewPageRequest(conf.DEFAULT_PAGE_SIZE, 1),
 		SkipItems: false,
 	}
 }

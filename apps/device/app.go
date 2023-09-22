@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Aaazj/mcenter/conf"
 	"github.com/go-playground/validator/v10"
 	request "github.com/infraboard/mcube/http/request"
 	"go.mongodb.org/mongo-driver/bson"
@@ -138,7 +139,7 @@ func NewQueryDeviceRequestFromHTTP(r *http.Request) *QueryDeviceRequest {
 
 func NewQueryDeviceRequest() *QueryDeviceRequest {
 	return &QueryDeviceRequest{
-		Page: request.NewPageRequest(20, 1),
+		Page: request.NewPageRequest(conf.DEFAULT_PAGE_SIZE, 1),
 	}
 }
 

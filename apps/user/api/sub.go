@@ -84,6 +84,8 @@ func (h *primary) Registry(ws *restful.WebService) {
 	ws.Route(ws.DELETE("/{id}").To(h.DeleteUser).
 		Metadata(label.Auth, true).
 		Metadata(label.Allow, user.TYPE_PRIMARY).
+		Metadata(label.Audit, true).
+		Metadata(label.Action, label.Delete.Value()).
 		Doc("删除子账号").
 		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
 		Metadata(restfulspec.KeyOpenAPITags, tags))
@@ -241,7 +243,7 @@ func (h *primary) DeleteUser(r *restful.Request, w *restful.Response) {
 		Errcode: 0,
 		Errmsg:  "OK",
 	}
-
+	fmt.Printf("\"DeleteUserDeleteUserDeleteUserDeleteUserDeleteUser\": %v\n", "DeleteUserDeleteUserDeleteUserDeleteUserDeleteUser")
 	req := user.NewDeleteUserRequest()
 	req.UserIds = append(req.UserIds, r.PathParameter("id"))
 
@@ -270,7 +272,6 @@ func (h *primary) QueryUser(r *restful.Request, w *restful.Response) {
 	}
 
 	req := user.NewQueryUserRequestFromHTTP(r.Request)
-	fmt.Printf("req: %v\n", req)
 
 	//6.9添加限制
 	tk := r.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)

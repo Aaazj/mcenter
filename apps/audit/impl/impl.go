@@ -20,7 +20,7 @@ var (
 type service struct {
 	col *mongo.Collection
 	log logger.Logger
-	audit.Service
+	audit.UnimplementedRPCServer
 }
 
 func (s *service) Config() error {
@@ -45,5 +45,6 @@ func (s *service) Registry(server *grpc.Server) {
 }
 
 func init() {
+	app.RegistryInternalApp(svr)
 	app.RegistryGrpcApp(svr)
 }

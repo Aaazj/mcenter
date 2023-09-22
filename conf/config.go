@@ -14,6 +14,10 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
 )
 
+const (
+	DEFAULT_PAGE_SIZE = 10
+)
+
 var (
 	mgoclient *mongo.Client
 )

@@ -18,6 +18,7 @@ import (
 	"github.com/Aaazj/mcenter/apps/namespace"
 	"github.com/Aaazj/mcenter/apps/service/provider/gitlab"
 	"github.com/Aaazj/mcenter/apps/token"
+	"github.com/Aaazj/mcenter/conf"
 )
 
 const (
@@ -121,7 +122,8 @@ func NewQueryServiceRequest() *QueryServiceRequest {
 
 func NewQueryServiceRequestFromHTTP(r *http.Request) *QueryServiceRequest {
 	return &QueryServiceRequest{
-		Page: request.NewPageRequestFromHTTP(r),
+		Page: request.NewPageRequest(conf.DEFAULT_PAGE_SIZE, 1),
+		//Page: request.NewPageRequestFromHTTP(r),
 	}
 }
 

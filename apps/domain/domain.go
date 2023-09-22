@@ -10,6 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 
 	"github.com/Aaazj/mcenter/common/format"
+	"github.com/Aaazj/mcenter/conf"
 	request "github.com/infraboard/mcube/http/request"
 	pb_request "github.com/infraboard/mcube/pb/request"
 	"github.com/infraboard/mcube/pb/resource"
@@ -213,7 +214,7 @@ func (s *DomainSet) Add(item *Domain) {
 
 func NewQueryDomainRequest() *QueryDomainRequest {
 	return &QueryDomainRequest{
-		Page:  request.NewPageRequest(20, 1),
+		Page:  request.NewPageRequest(conf.DEFAULT_PAGE_SIZE, 1),
 		Ids:   []string{},
 		Names: []string{},
 	}

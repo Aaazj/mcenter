@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RPC_AuditOperate_FullMethodName = "/mcenter.audit.RPC/AuditOperate"
+	RPC_AuditOperate_FullMethodName  = "/mcenter.audit.RPC/AuditOperate"
+	RPC_QueryAudit_FullMethodName    = "/mcenter.audit.RPC/QueryAudit"
+	RPC_DescribeAudit_FullMethodName = "/mcenter.audit.RPC/DescribeAudit"
 )
 
 // RPCClient is the client API for RPC service.
@@ -27,6 +29,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RPCClient interface {
 	AuditOperate(ctx context.Context, in *OperateLog, opts ...grpc.CallOption) (*AuditOperateLogResponse, error)
+	// 查询列表
+	QueryAudit(ctx context.Context, in *QueryAuditRequest, opts ...grpc.CallOption) (*OperateLogSet, error)
+	// 查询详情
+	DescribeAudit(ctx context.Context, in *DescribeAuditRequest, opts ...grpc.CallOption) (*OperateLog, error)
 }
 
 type rPCClient struct {
@@ -46,11 +52,33 @@ func (c *rPCClient) AuditOperate(ctx context.Context, in *OperateLog, opts ...gr
 	return out, nil
 }
 
+func (c *rPCClient) QueryAudit(ctx context.Context, in *QueryAuditRequest, opts ...grpc.CallOption) (*OperateLogSet, error) {
+	out := new(OperateLogSet)
+	err := c.cc.Invoke(ctx, RPC_QueryAudit_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rPCClient) DescribeAudit(ctx context.Context, in *DescribeAuditRequest, opts ...grpc.CallOption) (*OperateLog, error) {
+	out := new(OperateLog)
+	err := c.cc.Invoke(ctx, RPC_DescribeAudit_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RPCServer is the server API for RPC service.
 // All implementations must embed UnimplementedRPCServer
 // for forward compatibility
 type RPCServer interface {
 	AuditOperate(context.Context, *OperateLog) (*AuditOperateLogResponse, error)
+	// 查询列表
+	QueryAudit(context.Context, *QueryAuditRequest) (*OperateLogSet, error)
+	// 查询详情
+	DescribeAudit(context.Context, *DescribeAuditRequest) (*OperateLog, error)
 	mustEmbedUnimplementedRPCServer()
 }
 
@@ -60,6 +88,12 @@ type UnimplementedRPCServer struct {
 
 func (UnimplementedRPCServer) AuditOperate(context.Context, *OperateLog) (*AuditOperateLogResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuditOperate not implemented")
+}
+func (UnimplementedRPCServer) QueryAudit(context.Context, *QueryAuditRequest) (*OperateLogSet, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryAudit not implemented")
+}
+func (UnimplementedRPCServer) DescribeAudit(context.Context, *DescribeAuditRequest) (*OperateLog, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DescribeAudit not implemented")
 }
 func (UnimplementedRPCServer) mustEmbedUnimplementedRPCServer() {}
 
@@ -92,6 +126,42 @@ func _RPC_AuditOperate_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RPC_QueryAudit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAuditRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RPCServer).QueryAudit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RPC_QueryAudit_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RPCServer).QueryAudit(ctx, req.(*QueryAuditRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RPC_DescribeAudit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DescribeAuditRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RPCServer).DescribeAudit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RPC_DescribeAudit_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RPCServer).DescribeAudit(ctx, req.(*DescribeAuditRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RPC_ServiceDesc is the grpc.ServiceDesc for RPC service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +172,14 @@ var RPC_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AuditOperate",
 			Handler:    _RPC_AuditOperate_Handler,
+		},
+		{
+			MethodName: "QueryAudit",
+			Handler:    _RPC_QueryAudit_Handler,
+		},
+		{
+			MethodName: "DescribeAudit",
+			Handler:    _RPC_DescribeAudit_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

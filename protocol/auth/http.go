@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Aaazj/mcenter/apps/audit"
 	"github.com/Aaazj/mcenter/apps/endpoint"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/user"
@@ -13,9 +14,12 @@ import (
 	"github.com/infraboard/mcube/app"
 	"github.com/infraboard/mcube/cache"
 	"github.com/infraboard/mcube/exception"
+	"github.com/infraboard/mcube/http/label"
+	"github.com/infraboard/mcube/http/request"
 	"github.com/infraboard/mcube/http/restful/response"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
+	"github.com/rs/xid"
 	"k8s.io/klog/v2"
 )
 
@@ -23,6 +27,7 @@ func NewHttpAuther() *httpAuther {
 	return &httpAuther{
 		log:              zap.L().Named("auther.http"),
 		tk:               app.GetInternalApp(token.AppName).(token.Service),
+		audit:            app.GetInternalApp(audit.AppName).(audit.Service),
 		cache:            cache.C(),
 		codeCheckSilence: 30 * time.Minute,
 	}
@@ -31,6 +36,7 @@ func NewHttpAuther() *httpAuther {
 type httpAuther struct {
 	log              logger.Logger
 	tk               token.Service
+	audit            audit.Service
 	cache            cache.Cache
 	codeCheckSilence time.Duration
 }
@@ -74,7 +80,52 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 
 	}
 
+	start := time.Now()
+	fmt.Printf("start: %v\n", start)
 	next.ProcessFilter(req, resp)
+
+	cost := time.Now().Sub(start).Milliseconds()
+	//开启审计
+	//Metadata(label.Audit, label.Enable)
+
+	if entry != nil && entry.AuthEnable && entry.AuditLog {
+
+		tk := req.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
+		auditReq := audit.NewOperateLog(tk.Username, "", "")
+
+		auditReq.Id = xid.New().String()
+		auditReq.Url = req.Request.Method + " " + req.Request.URL.String()
+		fmt.Printf("req.Request: %v\n", req.Request)
+		fmt.Printf("req.Request.Proto: %v\n", req.Request.Proto)
+
+		fmt.Printf("resp.ResponseWriter: %v\n", resp.ResponseWriter)
+		fmt.Printf("resp.ResponseWriter.Header(): %v\n", resp.ResponseWriter.Header())
+
+		auditReq.Cost = cost
+		auditReq.StatusCode = int64(resp.StatusCode())
+		auditReq.UserAgent = req.Request.UserAgent()
+
+		// X-Forwar-For
+		auditReq.RemoteIp = request.GetRemoteIP(req.Request)
+
+		meta := req.SelectedRoute().Metadata()
+
+		if meta != nil {
+			if v, ok := meta[label.Resource]; ok {
+				auditReq.Resource, _ = v.(string)
+			}
+			if v, ok := meta[label.Action]; ok {
+				auditReq.Action, _ = v.(string)
+			}
+		}
+		fmt.Printf("\"aaaaaa\": %v\n", "aaaaaa")
+		_, err := a.audit.AuditOperate(req.Request.Context(), auditReq)
+		if err != nil {
+			a.log.Warnf("audit operate failed, %s", err)
+			return
+		}
+
+	}
 }
 
 func (a *httpAuther) CheckAccessToken(req *restful.Request) (*token.Token, error) {
