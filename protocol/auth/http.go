@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/Aaazj/mcenter/apps/audit"
@@ -55,8 +54,7 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 
 	// 请求拦截
 	entry := endpoint.NewEntryFromRestRequest(req)
-	fmt.Printf("\"11111111111111111111111111111111111\": %v\n", "11111111111111111111111111111111111")
-	fmt.Printf("entry: %v\n", entry)
+
 	if entry != nil && entry.AuthEnable {
 		// 访问令牌校验
 		tk, err := a.CheckAccessToken(req)
@@ -81,7 +79,7 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 	}
 
 	start := time.Now()
-	fmt.Printf("start: %v\n", start)
+
 	next.ProcessFilter(req, resp)
 
 	cost := time.Now().Sub(start).Milliseconds()
@@ -126,11 +124,11 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 func (a *httpAuther) CheckAccessToken(req *restful.Request) (*token.Token, error) {
 	// 获取用户Token, Token放在Heander Authorization
 	ak := token.GetAccessTokenFromHTTP(req.Request)
-	fmt.Printf("aaaaaaak: %v\n", ak)
+
 	if ak == "" {
 		return nil, token.ErrUnauthorized
 	}
-	fmt.Printf("ak: %v\n", ak)
+
 	// 调用GRPC 校验用户Token合法性
 	tk, err := a.tk.ValidateToken(req.Request.Context(), token.NewValidateTokenRequest(ak))
 	if err != nil {
@@ -139,7 +137,7 @@ func (a *httpAuther) CheckAccessToken(req *restful.Request) (*token.Token, error
 
 	// 是不是需要返回用户的认证信息: 那个人, 那个空间下面， token本身的信息
 	req.SetAttribute(token.TOKEN_ATTRIBUTE_NAME, tk)
-	fmt.Printf("\"111111\": %v\n", "111111")
+
 	return tk, nil
 }
 
