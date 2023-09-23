@@ -130,6 +130,7 @@ func NewRegistryResponse(message string) *RegistryResponse {
 
 // NewQueryEndpointRequestFromHTTP 列表查询请求
 func NewQueryEndpointRequestFromHTTP(r *http.Request) *QueryEndpointRequest {
+
 	page := request.NewPageRequestFromHTTP(r)
 	qs := r.URL.Query()
 
