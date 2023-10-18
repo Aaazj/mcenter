@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/infraboard/mcube/exception"
 	"go.mongodb.org/mongo-driver/bson"
@@ -123,7 +124,7 @@ func (s *impl) AllocationDevice(ctx context.Context, req *device.AllocationReque
 
 func (s *impl) ReleaseDevices(ctx context.Context, req *device.ReleaseDevicesRequest) (*device.DeviceSet, error) {
 	// 专门优化单个删除
-	fmt.Printf("req.Names: %v\n", req.Names)
+
 	var result *mongo.DeleteResult
 	var err error
 	if len(req.Names) == 1 {
@@ -185,17 +186,52 @@ func (s *impl) QueryDeviceByNamespace(ctx context.Context, req *device.QueryDevi
 			_, err := s.col.DeleteOne(ctx, req.FindFilter())
 			if err != nil {
 
-				klog.Error(exception.NewInternalServerError("device expired, delete device (%s)  error, %s", ins.Entry.Name, err))
+				klog.Error(exception.NewInternalServerError("device expired, delete device (%s)  error, %s", ins.Entry.Id, err))
 
 			}
-			klog.Error(exception.NewInternalServerError("device expired, delete device (%s) ", ins.Entry.Name))
+			klog.Error(exception.NewInternalServerError("device expired, delete device (%s) ", ins.Entry.Id))
 
 		} else {
 			if err := s.col.FindOneAndReplace(ctx, bson.M{"_id": ins.Id}, ins).Err(); err != nil {
-				klog.Error("device (%s)剩余时间更新失败", ins.Entry.Name)
+				klog.Error("device (%s)剩余时间更新失败", ins.Entry.Id)
 			}
-			set.Add(ins.Entry.Name)
+			set.Add(ins.Entry.Id)
 		}
 	}
 	return set, nil
+}
+
+func (s *impl) RenewalDevice(ctx context.Context, req *device.DeviceRenewalRequest) (*device.Device, error) {
+
+	if err := req.Validate(); err != nil {
+		return nil, exception.NewBadRequest(err.Error())
+	}
+
+	ins := device.NewDefaultDevice()
+	if err := s.col.FindOne(ctx, bson.M{"name": req.Name}).Decode(ins); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, exception.NewNotFound("Device %s not found or Device expired", req.Name)
+		}
+
+		return nil, exception.NewInternalServerError("find Device %s error, %s", req.Name, err)
+	}
+	ins.Entry.AllocateDays += req.RenewalTime
+	expiredAt := time.Unix(ins.CreateAt, 0).Add(time.Duration(ins.Entry.AllocateDays) * time.Hour * 24)
+
+	ins.ExpiredDate = expiredAt.Format("2006-01-02 15:04:05")
+
+	if !ins.ValidateDevice() { //过期  释放资源
+		_, err := s.col.DeleteOne(ctx, bson.M{"name": req.Name})
+		if err != nil {
+			return nil, exception.NewInternalServerError("device expired, delete device (%s)  error, %s", req.Name, err)
+		}
+		return nil, exception.NewInternalServerError("device expired, delete device (%s) ", req.Name)
+	} else {
+		if err := s.col.FindOneAndReplace(ctx, bson.M{"_id": ins.Id}, ins).Err(); err != nil {
+			klog.Error("device (%s)剩余时间更新失败", ins.Entry.Name)
+		}
+	}
+
+	return ins, nil
+
 }

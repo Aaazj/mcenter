@@ -132,7 +132,7 @@ message Profile {
     // 用户昵称, 用于在界面进行展示
     // @gotags: bson:"nick_name" json:"nick_name" validate:"lte=30"
     string nick_name = 2;
-    // 手机号码, 用户可以通过手机进行注册和密码找回, 还可以通过手机号进行登录
+    // 手机号码
     // @gotags: bson:"phone" json:"phone" validate:"lte=30"
     string phone = 3;
     // 邮箱, 用户可以通过邮箱进行注册和照明密码

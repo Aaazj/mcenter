@@ -8,12 +8,13 @@ import (
 	"github.com/infraboard/mcube/exception"
 	"github.com/infraboard/mcube/http/label"
 	"github.com/infraboard/mcube/http/request"
-	"github.com/infraboard/mcube/http/restful/response"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
+	"k8s.io/klog/v2"
 
 	"github.com/Aaazj/mcenter/apps/audit"
 	"github.com/Aaazj/mcenter/apps/endpoint"
+	"github.com/Aaazj/mcenter/conf"
 
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/user"
@@ -59,20 +60,57 @@ func (a *httpAuther) SetPermissionMode(m PermissionMode) {
 
 // 是否开启权限的控制, 交给中间件使用方去觉得
 func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Response, next *restful.FilterChain) {
+	fmt.Printf("\"GoRestfulAuthFuncGoRestfulAuthFuncGoRestfulAuthFuncGoRestfulAuthFunc\": %v\n", "GoRestfulAuthFuncGoRestfulAuthFuncGoRestfulAuthFuncGoRestfulAuthFunc")
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
 	// 请求拦截
 	entry := endpoint.NewEntryFromRestRequest(req)
 
 	if entry != nil && entry.AuthEnable {
 		// 访问令牌校验
 		tk, err := a.CheckAccessToken(req)
+
 		if err != nil {
-			response.Failed(resp, err)
+			if err == token.ErrTokenExpoired {
+
+				res.Errcode = 444
+				res.Errmsg = err.Error()
+				klog.V(4).Info(res)
+				if err := resp.WriteAsJson(res); err != nil {
+					klog.Error(err)
+				}
+				return
+			}
+			if err == token.ErrOtherPlaceLoggedIn {
+
+				res.Errcode = 50010
+				res.Errmsg = err.Error()
+				klog.V(4).Info(res)
+				if err := resp.WriteAsJson(res); err != nil {
+					klog.Error(err)
+				}
+				return
+			}
+			res.Errcode = 401001
+			res.Errmsg = err.Error()
+			klog.V(4).Info(res)
+			if err := resp.WriteAsJson(res); err != nil {
+				klog.Error(err)
+			}
 			return
 		}
 
 		err = a.CheckPermission(req, tk, entry)
 		if err != nil {
-			response.Failed(resp, err)
+			res.Errcode = 401002
+			res.Errmsg = err.Error()
+			klog.V(4).Info(res)
+			if err := resp.WriteAsJson(res); err != nil {
+				klog.Error(err)
+			}
 			return
 		}
 

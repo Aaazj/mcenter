@@ -669,7 +669,7 @@ type Profile struct {
 	// 用户昵称, 用于在界面进行展示
 	// @gotags: bson:"nick_name" json:"nick_name" validate:"lte=30"
 	NickName string `protobuf:"bytes,2,opt,name=nick_name,json=nickName,proto3" json:"nick_name" bson:"nick_name" validate:"lte=30"`
-	// 手机号码, 用户可以通过手机进行注册和密码找回, 还可以通过手机号进行登录
+	// 手机号码
 	// @gotags: bson:"phone" json:"phone" validate:"lte=30"
 	Phone string `protobuf:"bytes,3,opt,name=phone,proto3" json:"phone" bson:"phone" validate:"lte=30"`
 	// 邮箱, 用户可以通过邮箱进行注册和照明密码

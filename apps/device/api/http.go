@@ -2,10 +2,12 @@ package api
 
 import (
 	"github.com/Aaazj/mcenter/apps/device"
+	"github.com/Aaazj/mcenter/apps/user"
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/app"
+	"github.com/infraboard/mcube/http/label"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
 )
@@ -38,6 +40,11 @@ func (h *handler) Registry(ws *restful.WebService) {
 	ws.Route(ws.POST("/").To(h.AllocationDevice).
 		Doc("分配资源").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Metadata(label.Auth, label.Enable).
+		Metadata(label.Allow, user.TYPE_SUPPER).
+		Metadata(label.Audit, true).
+		Metadata(label.Resource, h.Name()).
+		Metadata(label.Action, "AllocationDevice").
 		Reads(device.AllocationRequest{}))
 
 	ws.Route(ws.GET("/").To(h.QueryDevice).
@@ -52,6 +59,20 @@ func (h *handler) Registry(ws *restful.WebService) {
 
 	ws.Route(ws.DELETE("/").To(h.ReleaseDevices).
 		Doc("释放资源").
+		Metadata(label.Auth, label.Enable).
+		Metadata(label.Allow, user.TYPE_SUPPER).
+		Metadata(label.Audit, true).
+		Metadata(label.Resource, h.Name()).
+		Metadata(label.Action, "ReleaseDevices").
+		Metadata(restfulspec.KeyOpenAPITags, tags))
+
+	ws.Route(ws.POST("/renewal").To(h.RenewalDevice).
+		Doc("续租资源").
+		Metadata(label.Auth, label.Enable).
+		Metadata(label.Allow, user.TYPE_SUPPER).
+		Metadata(label.Audit, true).
+		Metadata(label.Resource, h.Name()).
+		Metadata(label.Action, "RenewalDevice").
 		Metadata(restfulspec.KeyOpenAPITags, tags))
 
 }

@@ -232,7 +232,7 @@ func (e *Entry) UniquePath() string {
 }
 
 func (e *Entry) IsAllow(target fmt.Stringer) bool {
-	fmt.Printf("target: %v\n", target)
+
 	for i := range e.Allow {
 		if e.Allow[i] == "*" {
 			return true

@@ -44,6 +44,7 @@ func (i *issuer) validate(ctx context.Context, username, pass string) (*user.Use
 	// 检测用户的密码是否正确
 	u, err := i.user.DescribeUser(ctx, user.NewDescriptUserRequestByName(username))
 	if err != nil {
+		err = AUTH_FAILED
 		return nil, err
 	}
 	if err := u.Password.CheckPassword(pass); err != nil {

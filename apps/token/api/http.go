@@ -48,7 +48,7 @@ func (h *handler) Registry(ws *restful.WebService) {
 
 	ws.Route(ws.DELETE("/").To(h.RevolkToken).
 		Doc("撤销令牌").
-		Metadata(label.Auth, true).
+		//Metadata(label.Auth, true).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Writes(token.Token{}).
 		Returns(200, "OK", token.Token{}).

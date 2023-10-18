@@ -22,6 +22,7 @@ import (
 // NewHTTPService 构建函数
 func NewHTTPService() *HTTPService {
 	r := restful.DefaultContainer
+	//r := restful.NewContainer()
 	// Optionally, you can install the Swagger Service which provides a nice Web UI on your REST API
 	// You need to download the Swagger HTML5 assets and change the FilePath location in the config below.
 	// Open http://localhost:8080/apidocs/?url=http://localhost:8080/apidocs.json
@@ -31,26 +32,26 @@ func NewHTTPService() *HTTPService {
 	cors := restful.CrossOriginResourceSharing{
 		ExposeHeaders:  []string{"*"},
 		AllowedHeaders: []string{"*"},
-		AllowedDomains: []string{"*"},
+		AllowedDomains: []string{".*"},
 		AllowedMethods: []string{"HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"},
 		CookiesAllowed: false,
 		Container:      r,
 	}
 	r.Filter(cors.Filter)
-	// trace中间件
-	// filter := otelrestful.OTelFilter(version.ServiceName)
-	// restful.DefaultContainer.Filter(filter)
+
 	// 添加鉴权中间件
 	r.Filter(auth.NewHttpAuther().GoRestfulAuthFunc)
 
+	//r.Filter(r.OPTIONSFilter)
+
 	server := &http.Server{
-		ReadHeaderTimeout: 60 * time.Second,
-		ReadTimeout:       60 * time.Second,
-		WriteTimeout:      60 * time.Second,
-		IdleTimeout:       60 * time.Second,
-		MaxHeaderBytes:    1 << 20, // 1M
-		Addr:              conf.C().App.HTTP.Addr(),
-		Handler:           r,
+		// ReadHeaderTimeout: 60 * time.Second,
+		// ReadTimeout:       60 * time.Second,
+		// WriteTimeout:      60 * time.Second,
+		// IdleTimeout:       60 * time.Second,
+		// MaxHeaderBytes:    1 << 20, // 1M
+		Addr:    conf.C().App.HTTP.Addr(),
+		Handler: r,
 	}
 
 	return &HTTPService{
@@ -92,6 +93,8 @@ func (s *HTTPService) Start() error {
 	}
 	s.r.Add(restfulspec.NewOpenAPIService(config))
 	s.l.Infof("Get the API using http://%s%s", s.c.App.HTTP.Addr(), config.APIPath)
+
+	s.server.Handler = s.r
 
 	// 启动 HTTP服务
 	s.l.Infof("HTTP服务启动成功, 监听地址: %s", s.server.Addr)

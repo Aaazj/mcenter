@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/app"
@@ -58,7 +56,7 @@ func (h *sub) UpdatePassword(r *restful.Request, w *restful.Response) {
 
 	req := user.NewUpdatePasswordRequest()
 	req.UserId = tk.UserId
-	fmt.Printf("req.UserId: %v\n", req.UserId)
+
 	if err := r.ReadEntity(req); err != nil {
 		//response.Failed(w, err)
 		res.Errmsg = "读取密码信息失败:" + err.Error()

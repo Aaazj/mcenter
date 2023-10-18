@@ -15,7 +15,6 @@ import (
 	"github.com/infraboard/mcube/exception"
 	"github.com/infraboard/mcube/http/label"
 	"github.com/infraboard/mcube/http/request"
-	"github.com/infraboard/mcube/http/restful/response"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
 	"github.com/rs/xid"
@@ -58,8 +57,28 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 	if entry != nil && entry.AuthEnable {
 		// 访问令牌校验
 		tk, err := a.CheckAccessToken(req)
+
 		if err != nil {
-			//response.Failed(resp, err)
+			if err == token.ErrTokenExpoired {
+
+				res.Errcode = 444
+				res.Errmsg = err.Error()
+				klog.V(4).Info(res)
+				if err := resp.WriteAsJson(res); err != nil {
+					klog.Error(err)
+				}
+				return
+			}
+			if err == token.ErrOtherPlaceLoggedIn {
+
+				res.Errcode = 50010
+				res.Errmsg = err.Error()
+				klog.V(4).Info(res)
+				if err := resp.WriteAsJson(res); err != nil {
+					klog.Error(err)
+				}
+				return
+			}
 			res.Errcode = 401001
 			res.Errmsg = err.Error()
 			klog.V(4).Info(res)
@@ -72,7 +91,12 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 		// 接口调用权限校验
 		err = a.CheckPermission(req.Request.Context(), tk, entry)
 		if err != nil {
-			response.Failed(resp, err)
+			res.Errcode = 401002
+			res.Errmsg = err.Error()
+			klog.V(4).Info(res)
+			if err := resp.WriteAsJson(res); err != nil {
+				klog.Error(err)
+			}
 			return
 		}
 

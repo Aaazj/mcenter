@@ -14,6 +14,7 @@ service RPC {
     rpc ReleaseDevices(ReleaseDevicesRequest) returns(DeviceSet);
     rpc ValidateDevice(ValidateDeviceRequest) returns(Device);
     rpc QueryDeviceByNamespace(QueryDeviceByNamespaceRequest) returns(DeviceByNamespaceSet);
+    rpc RenewalDevice(DeviceRenewalRequest) returns(Device);
 }
 
 
@@ -87,4 +88,18 @@ message ValidateDeviceRequest{
 
      // @gotags: json:"name"
     string name = 1;
+}
+
+
+// Entry 条目
+message DeviceRenewalRequest {
+
+
+    // 资源名称
+    // @gotags: bson:"name" json:"name" validate:"required"
+    string name =1;
+    // 设备分配时间
+    // @gotags: bson:"renewal_time" json:"renewal_time" validate:"required"
+    int64 RenewalTime =2;
+
 }

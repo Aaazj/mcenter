@@ -4,18 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Aaazj/mcenter/apps/endpoint"
+	"github.com/Aaazj/mcenter/apps/service"
+	"github.com/Aaazj/mcenter/apps/token"
+	"github.com/Aaazj/mcenter/apps/user"
+	"github.com/Aaazj/mcenter/client/rest"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/exception"
 	"github.com/infraboard/mcube/http/restful/response"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
-
-	"github.com/Aaazj/mcenter/apps/endpoint"
-	//"github.com/Aaazj/mcenter/apps/policy"
-	"github.com/Aaazj/mcenter/apps/service"
-	"github.com/Aaazj/mcenter/apps/token"
-	"github.com/Aaazj/mcenter/apps/user"
-	"github.com/Aaazj/mcenter/client/rest"
 )
 
 // RestfulServerInterceptor go-restful认证中间件
@@ -76,7 +74,7 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 
 		// 是不是需要返回用户的认证信息: 那个人, 那个空间下面， token本身的信息
 		req.SetAttribute(token.TOKEN_ATTRIBUTE_NAME, tk)
-		fmt.Printf("\"333333\": %v\n", "333333")
+
 		if entry.PermissionEnable {
 			// 权限检查
 			err := a.CheckPermission(req, tk, entry)

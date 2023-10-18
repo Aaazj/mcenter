@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/emicklei/go-restful/v3"
 	"k8s.io/klog/v2"
 
@@ -29,8 +27,7 @@ func (h *handler) CreateNamespace(r *restful.Request, w *restful.Response) {
 		}
 		return
 	}
-	tk := r.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
-	fmt.Printf("tk: %v\n", tk)
+
 	req.UpdateOwner(token.GetTokenFromRequest(r))
 
 	set, err := h.service.CreateNamespace(r.Request.Context(), req)

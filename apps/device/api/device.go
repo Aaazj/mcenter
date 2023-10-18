@@ -139,39 +139,40 @@ func (u *handler) DescribeDevice(r *restful.Request, w *restful.Response) {
 	//response.Success(w, ins)
 }
 
-// func (h *handler) PutNamespace(r *restful.Request, w *restful.Response) {
+func (u *handler) RenewalDevice(r *restful.Request, w *restful.Response) {
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
 
-// 	res := conf.GeneralResponse{
-// 		Errcode: 0,
-// 		Errmsg:  "OK",
-// 	}
-// 	req := namespace.NewPutNamespaceRequest(r.PathParameter("d_id"), r.PathParameter("id"))
+	req := device.NewDefaultDeviceRenewalRequest()
 
-// 	if err := r.ReadEntity(req.Spec); err != nil {
-// 		//response.Failed(w, err)
-// 		res.Errcode = 401001
-// 		res.Errmsg = err.Error()
-// 		klog.V(4).Info(res)
-// 		if err := w.WriteAsJson(res); err != nil {
-// 			klog.Error(err)
-// 		}
-// 		return
-// 	}
+	if err := request.GetDataFromRequest(r.Request, req); err != nil {
 
-// 	set, err := h.service.UpdateNamespace(r.Request.Context(), req)
-// 	if err != nil {
-// 		//response.Failed(w, err)
-// 		res.Errcode = 401002
-// 		res.Errmsg = err.Error()
-// 		klog.V(4).Info(res)
-// 		if err := w.WriteAsJson(res); err != nil {
-// 			klog.Error(err)
-// 		}
-// 		return
-// 	}
-// 	//response.Success(w, set)
-// 	res.Data = set
-// 	if err = w.WriteAsJson(res); err != nil {
-// 		klog.Error(err)
-// 	}
-// }
+		res.Errcode = 401001
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
+		return
+	}
+
+	ins, err := h.service.RenewalDevice(r.Request.Context(), req)
+	if err != nil {
+		//response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
+		return
+	}
+
+	res.Data = ins
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+	//response.Success(w, ins)
+}

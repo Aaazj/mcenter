@@ -5,7 +5,6 @@ import (
 
 	"github.com/Aaazj/mcenter/apps/user"
 	"github.com/infraboard/mcube/exception"
-	"github.com/infraboard/mcube/pb/request"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -92,17 +91,22 @@ func (s *service) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (
 		return nil, err
 	}
 
-	switch req.UpdateMode {
-	case request.UpdateMode_PUT:
-		ins.Update(req)
-	case request.UpdateMode_PATCH:
-		ins.Spec.Description = req.Description
-		err := ins.Patch(req)
-		if err != nil {
-			return nil, exception.NewBadRequest("patch error, %s", err)
-		}
-	}
+	// switch req.UpdateMode {
+	// case request.UpdateMode_PUT:
+	// 	ins.Update(req)
+	// case request.UpdateMode_PATCH:
+	// 	ins.Spec.Description = req.Description
+	// 	err := ins.Patch(req)
+	// 	if err != nil {
+	// 		return nil, exception.NewBadRequest("patch error, %s", err)
+	// 	}
+	// }
 
+	ins.Spec.Description = req.Description
+	err = ins.Patch(req)
+	if err != nil {
+		return nil, exception.NewBadRequest("patch error, %s", err)
+	}
 	if err := s.update(ctx, ins); err != nil {
 		return nil, err
 	}

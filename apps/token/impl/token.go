@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	//"github.com/Aaazj/mcenter/apps/policy"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/token/provider"
 	"github.com/infraboard/mcube/exception"
@@ -13,7 +12,7 @@ import (
 
 func (s *service) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (
 	*token.Token, error) {
-
+	fmt.Printf("\"IssueToken\": %v\n", "IssueToken")
 	//登陆前安全检查
 	if err := s.BeforeLoginSecurityCheck(ctx, req); err != nil {
 		return nil, exception.NewBadRequest(err.Error())
@@ -57,7 +56,7 @@ func (s *service) IssueTokenNow(ctx context.Context, req *token.IssueTokenReques
 	// if tk.Namespace == "" {
 	// 	s.setDefaultNamespace(ctx, tk)
 	// }
-	fmt.Printf("\"bbbbb\": %v\n", "bbbbb")
+
 	if !req.DryRun {
 		// 入库保存
 		if err := s.save(ctx, tk); err != nil {
@@ -74,12 +73,12 @@ func (s *service) IssueTokenNow(ctx context.Context, req *token.IssueTokenReques
 }
 
 func (s *service) BeforeLoginSecurityCheck(ctx context.Context, req *token.IssueTokenRequest) error {
-	fmt.Printf("\"bbbbbbbb\": %v\n", "bbbbbbbb")
+
 	// 连续登录失败检测
 	if err := s.checker.MaxFailedRetryCheck(ctx, req); err != nil {
 		return exception.NewBadRequest("%s", err)
 	}
-	fmt.Printf("\"exceptionexceptionexceptionexception\": %v\n", "exceptionexceptionexceptionexception")
+
 	// IP保护检测
 	// err := s.checker.IPProtectCheck(ctx, req)
 	// if err != nil {
@@ -141,12 +140,12 @@ func (s *service) RevolkToken(ctx context.Context, req *token.RevolkTokenRequest
 	*token.Token, error) {
 	tk, err := s.get(ctx, req.AccessToken)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 
-	if tk.RefreshToken != req.RefreshToken {
-		return nil, exception.NewBadRequest("refresh token not correct")
-	}
+	// if tk.RefreshToken != req.RefreshToken {
+	// 	return nil, exception.NewBadRequest("refresh token not correct")
+	// }
 	// 关闭web登录
 	tk, err = s.blockToken(ctx, tk)
 	if err != nil {
@@ -171,7 +170,8 @@ func (s *service) ValidateToken(ctx context.Context, req *token.ValidateTokenReq
 	}
 
 	if tk.Status.IsBlock {
-		return nil, s.makeBlockExcption(tk.Status.BlockType, tk.Status.BlockMessage())
+		//return nil, s.makeBlockExcption(tk.Status.BlockType, tk.Status.BlockMessage())
+		return nil, token.ErrOtherPlaceLoggedIn
 	}
 
 	// 校验Access Token是否过期
@@ -204,7 +204,7 @@ func (s *service) makeBlockExcption(bt token.BLOCK_TYPE, message string) excepti
 func (s *service) reuseToken(ctx context.Context, tk *token.Token) error {
 	// 刷新token过期的，不允许复用
 	if tk.CheckRefreshIsExpired() {
-		return exception.NewRefreshTokenExpired("refresh_token: %s expoired", tk.RefreshToken)
+		return token.ErrTokenExpoired
 	}
 
 	// access token延长一个过期周期

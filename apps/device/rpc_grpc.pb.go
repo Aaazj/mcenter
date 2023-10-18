@@ -25,6 +25,7 @@ const (
 	RPC_ReleaseDevices_FullMethodName         = "/mcenter.device.RPC/ReleaseDevices"
 	RPC_ValidateDevice_FullMethodName         = "/mcenter.device.RPC/ValidateDevice"
 	RPC_QueryDeviceByNamespace_FullMethodName = "/mcenter.device.RPC/QueryDeviceByNamespace"
+	RPC_RenewalDevice_FullMethodName          = "/mcenter.device.RPC/RenewalDevice"
 )
 
 // RPCClient is the client API for RPC service.
@@ -37,6 +38,7 @@ type RPCClient interface {
 	ReleaseDevices(ctx context.Context, in *ReleaseDevicesRequest, opts ...grpc.CallOption) (*DeviceSet, error)
 	ValidateDevice(ctx context.Context, in *ValidateDeviceRequest, opts ...grpc.CallOption) (*Device, error)
 	QueryDeviceByNamespace(ctx context.Context, in *QueryDeviceByNamespaceRequest, opts ...grpc.CallOption) (*DeviceByNamespaceSet, error)
+	RenewalDevice(ctx context.Context, in *DeviceRenewalRequest, opts ...grpc.CallOption) (*Device, error)
 }
 
 type rPCClient struct {
@@ -101,6 +103,15 @@ func (c *rPCClient) QueryDeviceByNamespace(ctx context.Context, in *QueryDeviceB
 	return out, nil
 }
 
+func (c *rPCClient) RenewalDevice(ctx context.Context, in *DeviceRenewalRequest, opts ...grpc.CallOption) (*Device, error) {
+	out := new(Device)
+	err := c.cc.Invoke(ctx, RPC_RenewalDevice_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RPCServer is the server API for RPC service.
 // All implementations must embed UnimplementedRPCServer
 // for forward compatibility
@@ -111,6 +122,7 @@ type RPCServer interface {
 	ReleaseDevices(context.Context, *ReleaseDevicesRequest) (*DeviceSet, error)
 	ValidateDevice(context.Context, *ValidateDeviceRequest) (*Device, error)
 	QueryDeviceByNamespace(context.Context, *QueryDeviceByNamespaceRequest) (*DeviceByNamespaceSet, error)
+	RenewalDevice(context.Context, *DeviceRenewalRequest) (*Device, error)
 	mustEmbedUnimplementedRPCServer()
 }
 
@@ -135,6 +147,9 @@ func (UnimplementedRPCServer) ValidateDevice(context.Context, *ValidateDeviceReq
 }
 func (UnimplementedRPCServer) QueryDeviceByNamespace(context.Context, *QueryDeviceByNamespaceRequest) (*DeviceByNamespaceSet, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryDeviceByNamespace not implemented")
+}
+func (UnimplementedRPCServer) RenewalDevice(context.Context, *DeviceRenewalRequest) (*Device, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RenewalDevice not implemented")
 }
 func (UnimplementedRPCServer) mustEmbedUnimplementedRPCServer() {}
 
@@ -257,6 +272,24 @@ func _RPC_QueryDeviceByNamespace_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RPC_RenewalDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeviceRenewalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RPCServer).RenewalDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RPC_RenewalDevice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RPCServer).RenewalDevice(ctx, req.(*DeviceRenewalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RPC_ServiceDesc is the grpc.ServiceDesc for RPC service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +320,10 @@ var RPC_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "QueryDeviceByNamespace",
 			Handler:    _RPC_QueryDeviceByNamespace_Handler,
+		},
+		{
+			MethodName: "RenewalDevice",
+			Handler:    _RPC_RenewalDevice_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

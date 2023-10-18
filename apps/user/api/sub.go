@@ -44,6 +44,8 @@ func (h *primary) Registry(ws *restful.WebService) {
 	ws.Route(ws.POST("/").To(h.CreateUser).
 		Metadata(label.Auth, true).
 		Metadata(label.Allow, user.TYPE_PRIMARY).
+		Metadata(label.Audit, true).
+		Metadata(label.Resource, h.Name()).
 		Doc("创建子账号").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads(user.CreateUserRequest{}).
@@ -85,6 +87,7 @@ func (h *primary) Registry(ws *restful.WebService) {
 		Metadata(label.Auth, true).
 		Metadata(label.Allow, user.TYPE_PRIMARY).
 		Metadata(label.Audit, true).
+		Metadata(label.Resource, h.Name()).
 		Metadata(label.Action, label.Delete.Value()).
 		Doc("删除子账号").
 		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
@@ -94,6 +97,18 @@ func (h *primary) Registry(ws *restful.WebService) {
 		Metadata(label.Auth, true).
 		Metadata(label.Allow, user.TYPE_PRIMARY).
 		Doc("重置子账号密码").
+		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
+		Metadata(restfulspec.KeyOpenAPITags, tags))
+
+	ws.Route(ws.PUT("/{id}").To(h.PutUserAvatar).
+		Metadata(label.Auth, true).
+		Doc("修改头像").
+		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
+		Metadata(restfulspec.KeyOpenAPITags, tags))
+
+	ws.Route(ws.GET("/avatar/{name}").To(h.DescribeUserAvatar).
+		// Metadata(label.Auth, true).
+		Doc("获取头像").
 		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
 		Metadata(restfulspec.KeyOpenAPITags, tags))
 }
@@ -148,8 +163,6 @@ func (h *primary) CreateUser(r *restful.Request, w *restful.Response) {
 		}
 	}
 
-	fmt.Printf("req.Domain222222222222: %v\n", req.Domain)
-
 	set, err := h.service.CreateUser(r.Request.Context(), req)
 	if err != nil {
 		//response.Failed(w, err)
@@ -169,18 +182,70 @@ func (h *primary) CreateUser(r *restful.Request, w *restful.Response) {
 }
 
 func (h *primary) PutUser(r *restful.Request, w *restful.Response) {
+
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
 	req := user.NewPutUserRequest(r.PathParameter("id"))
 	if err := r.ReadEntity(req.Profile); err != nil {
-		response.Failed(w, err)
+		res.Errcode = 401001
+		res.Errmsg = "读取信息失败:" + err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
 
 	set, err := h.service.UpdateUser(r.Request.Context(), req)
 	if err != nil {
-		response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
 		return
 	}
-	response.Success(w, set)
+	res.Data = set
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+}
+
+func (h *primary) PutUserAvatar(r *restful.Request, w *restful.Response) {
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
+	req := user.NewPutUserRequest(r.PathParameter("id"))
+	if err := r.ReadEntity(req.Profile); err != nil {
+		res.Errcode = 401001
+		res.Errmsg = "读取信息失败:" + err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
+		return
+	}
+
+	set, err := h.service.UpdateUser(r.Request.Context(), req)
+	if err != nil {
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
+		return
+	}
+	res.Data = set
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
 }
 
 func (h *primary) PatchUser(r *restful.Request, w *restful.Response) {
@@ -243,7 +308,7 @@ func (h *primary) DeleteUser(r *restful.Request, w *restful.Response) {
 		Errcode: 0,
 		Errmsg:  "OK",
 	}
-	fmt.Printf("\"DeleteUserDeleteUserDeleteUserDeleteUserDeleteUser\": %v\n", "DeleteUserDeleteUserDeleteUserDeleteUserDeleteUser")
+
 	req := user.NewDeleteUserRequest()
 	req.UserIds = append(req.UserIds, r.PathParameter("id"))
 
@@ -344,6 +409,32 @@ func (h *primary) DescribeUser(r *restful.Request, w *restful.Response) {
 	//response.Success(w, ins)
 }
 
+func (h *primary) DescribeUserAvatar(r *restful.Request, w *restful.Response) {
+	res := conf.GeneralResponse{
+		Errcode: 0,
+		Errmsg:  "OK",
+	}
+
+	req := user.NewDescriptUserRequestByName(r.PathParameter("name"))
+
+	ins, err := h.service.DescribeUser(r.Request.Context(), req)
+	if err != nil {
+		//response.Failed(w, err)
+		res.Errcode = 401002
+		res.Errmsg = err.Error()
+		klog.V(4).Info(res)
+		if err := w.WriteAsJson(res); err != nil {
+			klog.Error(err)
+		}
+		return
+	}
+
+	res.Data = ins.Profile.Avatar
+	if err = w.WriteAsJson(res); err != nil {
+		klog.Error(err)
+	}
+
+}
 func init() {
 	app.RegistryRESTfulApp(&primary{})
 }

@@ -42,6 +42,9 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(label.Auth, label.Enable).
 		Metadata(label.Allow, user.TYPE_SUPPER).
+		Metadata(label.Audit, true).
+		Metadata(label.Resource, h.Name()).
+		Metadata(label.Action, "Create").
 		Reads(namespace.CreateNamespaceRequest{}).
 		Writes(namespace.Namespace{}))
 
@@ -57,6 +60,9 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Doc("删除空间").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(label.Auth, label.Enable).
+		Metadata(label.Resource, h.Name()).
+		Metadata(label.Audit, true).
+		Metadata(label.Action, "Delete").
 		Metadata(label.Allow, user.TYPE_SUPPER))
 
 	ws.Route(ws.GET("/").To(h.QueryNamespace).

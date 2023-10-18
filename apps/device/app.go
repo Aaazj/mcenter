@@ -32,14 +32,17 @@ func (req *AllocationRequest) Devices() []*Device {
 		if req.Entries[i].AllocateDays == 0 {
 			req.Entries[i].AllocateDays = 30
 		}
+		now := time.Now()
+		expiredAt := time.Unix(now.Unix(), 0).Add(time.Duration(req.Entries[i].AllocateDays) * time.Hour * 24)
 		ep := &Device{
 			Id:            GenHashID("device", req.Entries[i].Name),
-			CreateAt:      time.Now().Unix(),
+			CreateAt:      now.Unix(),
 			Domain:        req.Domain,
 			Namespace:     req.Namespace,
-			CreateDate:    time.Now().Format("2006-01-02 15:04:05"),
+			CreateDate:    now.Format("2006-01-02 15:04:05"),
 			RemainingDays: req.Entries[i].AllocateDays,
 			Entry:         req.Entries[i],
+			ExpiredDate:   expiredAt.Format("2006-01-02 15:04:05"),
 		}
 		eps = append(eps, ep)
 	}
@@ -71,6 +74,21 @@ func NewDefaultAllocationRequest() *AllocationRequest {
 	}
 }
 
+func NewDefaultDeviceRenewalRequest() *DeviceRenewalRequest {
+	return &DeviceRenewalRequest{
+		RenewalTime: 30,
+	}
+}
+
+// Validate 校验注册请求合法性
+func (req *DeviceRenewalRequest) Validate() error {
+	if req.Name == "" {
+		return fmt.Errorf("must require device name")
+	}
+
+	return validate.Struct(req)
+}
+
 func NewDescriptDeviceRequestWithName(name string) *DescribeDeviceRequest {
 	return &DescribeDeviceRequest{Name: name}
 }
@@ -98,9 +116,9 @@ func (x *Device) ValidateDevice() bool {
 	expiredAt := time.Unix(x.CreateAt, 0).Add(time.Duration(x.Entry.AllocateDays) * time.Hour * 24)
 
 	ex := now.Sub(expiredAt).Hours() / 24
-	fmt.Printf("ex: %v\n", ex)
+
 	x.RemainingDays = int64(-ex)
-	fmt.Printf("x: %v\n", x)
+
 	return time.Unix(Expiredtime, 0).After(time.Now())
 
 }

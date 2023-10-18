@@ -30,8 +30,11 @@ message Device {
     // @gotags: bson:",inline" json:"entry" validate:"required"
     DeviceEntry entry = 6;
     // 剩余时间
-    // @gotags: bson:",remaining_days" json:"remaining_days,omitempty" 
+    // @gotags: bson:"remaining_days" json:"remaining_days" 
     int64 remaining_days = 7;
+    // 到期日期
+    // @gotags: bson:"expired_date" json:"expired_date" 
+    string expired_date = 8;
    
 }
 
@@ -63,7 +66,6 @@ message DeviceSet {
     // @gotags: bson:"items" json:"items"
     repeated Device items = 2;
 }
-
 
 
 
