@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package mcenter.line;
+option go_package = "github.com/Aaazj/mcenter/apps/line";
+
+
+import "mcenter/apps/line/pb/line.proto";
+
+// RPC endpoint管理
+service RPC {
+
+	rpc CreateLine(CreateLineRequest) returns(Line);
+    rpc DeleteLines(DeleteLinesRequest) returns(LineSet);
+    rpc QueryLineByNamespace(QueryLineByNamespaceRequest) returns(LineByNamespaceSet);
+}
+
+
+message QueryLineByNamespaceRequest{
+       // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 1;
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 2;
+}
+  
+message LineByNamespaceSet {
+    // @gotags: bson:"items" json:"items"
+    repeated string items = 1;
+}
+
+
+
+
+
+
+message CreateLineRequest{
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 1;
+    // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 2;
+
+             // 资源名称
+    // @gotags: bson:"name" json:"name"
+    string name =3;
+    // 资源ID
+    // @gotags: bson:"line_id" json:"line_id"
+    string line_id =4;
+    // 归属人
+    // @gotags: bson:"owner" json:"owner"
+    string owner =5;
+   
+}
+
+
+
+
+message DeleteLinesRequest{
+
+     // @gotags: json:"ids"
+    repeated string ids = 1;
+}
+
+
+

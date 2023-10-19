@@ -135,7 +135,7 @@ func (h *primary) CreateUser(r *restful.Request, w *restful.Response) {
 	}
 
 	tk := r.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
-	fmt.Printf("tk: %v\n", tk)
+
 	if tk.UserType != user.TYPE_SUPPER {
 		fmt.Printf("int32(req.Type): %v\n", int32(req.Type))
 		//没有权限创建超级管理员

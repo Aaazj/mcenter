@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package mcenter.image;
+option go_package = "github.com/Aaazj/mcenter/apps/image";
+
+
+
+
+
+// Endpoint Service's features
+message Image {
+    
+    // @gotags: bson:"_id" json:"id" validate:"required,lte=64"
+    string id = 1;
+    // 创建时间
+    // @gotags: bson:"create_at" json:"create_at,omitempty"
+    int64 create_at = 2;
+    // 创建日期
+    // @gotags: bson:",create_date" json:"create_date,omitempty" 
+    string create_date = 3;
+    
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 4;
+    // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 5;
+
+    // 资源名称
+    // @gotags: bson:"name" json:"name"
+    string name =6;
+    // 资源ID
+    // @gotags: bson:"image_id" json:"image_id"
+    string image_id =7;
+    // 归属人
+    // @gotags: bson:"owner" json:"owner"
+    string owner =8;
+   
+}
+
+
+
+
+
+
+
+message ImageSet {
+    // @gotags: bson:"total" json:"total"
+    int64 total = 1;
+    // @gotags: bson:"items" json:"items"
+    repeated Image items = 2;
+}
+
+
+
+

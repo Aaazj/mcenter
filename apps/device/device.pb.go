@@ -149,8 +149,8 @@ type DeviceEntry struct {
 	// @gotags: bson:"name" json:"name"
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name" bson:"name"`
 	// 资源ID
-	// @gotags: id:"name" json:"id"
-	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id" id:"name"`
+	// @gotags: bson:"id" json:"id"
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id" bson:"id"`
 	// 设备分配时间
 	// @gotags: bson:"allocate_days" json:"allocate_days"
 	AllocateDays int64 `protobuf:"varint,3,opt,name=AllocateDays,proto3" json:"allocate_days" bson:"allocate_days"`

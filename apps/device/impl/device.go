@@ -141,7 +141,8 @@ func (s *impl) ReleaseDevices(ctx context.Context, req *device.ReleaseDevicesReq
 		return nil, exception.NewInternalServerError("delete device(%s) error, %s", req.Names[0], err)
 	}
 	if result.DeletedCount == 0 {
-		fmt.Printf("\"return exception.NewNotFound\": %v\n", "return exception.NewNotFound")
+
+		return nil, exception.NewNotFound("device %s not found", req.Names)
 	}
 	return nil, nil
 }

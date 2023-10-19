@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"time"
 
 	"github.com/Aaazj/mcenter/apps/audit"
@@ -45,6 +47,11 @@ func (a *httpAuther) SetCodeCheckSilenceTime(t time.Duration) {
 }
 
 func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Response, next *restful.FilterChain) {
+
+	// buf, _ := io.ReadAll(req.Request.Body)
+	// s2 := string(buf)
+	// fmt.Printf("s2: %v\n", s2)
+	//req.Request.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 	res := conf.GeneralResponse{
 		Errcode: 0,
@@ -111,6 +118,10 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 	//Metadata(label.Audit, label.Enable)
 
 	if entry != nil && entry.AuthEnable && entry.AuditLog {
+		fmt.Printf("req.Request: %v\n", req.Request)
+
+		b, _ := io.ReadAll(req.Request.Body)
+		fmt.Printf("b: %v\n", b)
 
 		tk := req.Attribute(token.TOKEN_ATTRIBUTE_NAME).(*token.Token)
 		auditReq := audit.NewOperateLog(tk.Username, "", "")

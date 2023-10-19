@@ -22,6 +22,8 @@ import (
 	//_ "github.com/Aaazj/mcenter/apps/role/impl"
 	_ "github.com/Aaazj/mcenter/apps/audit/impl"
 	_ "github.com/Aaazj/mcenter/apps/device/impl"
+	_ "github.com/Aaazj/mcenter/apps/image/impl"
+	_ "github.com/Aaazj/mcenter/apps/line/impl"
 	_ "github.com/Aaazj/mcenter/apps/service/impl"
 	_ "github.com/Aaazj/mcenter/apps/token/impl"
 	_ "github.com/Aaazj/mcenter/apps/user/impl"

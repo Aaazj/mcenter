@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package mcenter.image;
+option go_package = "github.com/Aaazj/mcenter/apps/image";
+
+import "page/page.proto";
+import "mcenter/apps/image/pb/image.proto";
+
+// RPC endpoint管理
+service RPC {
+	//rpc DescribeImage(DescribeImageRequest) returns(Image);
+	//rpc QueryImage(QueryImageRequest) returns(ImageSet);
+	rpc CreateImage(CreateImageRequest) returns(Image);
+    rpc DeleteImages(DeleteImagesRequest) returns(ImageSet);
+    rpc QueryImageByNamespace(QueryImageByNamespaceRequest) returns(ImageByNamespaceSet);
+}
+
+
+message QueryImageByNamespaceRequest{
+       // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 1;
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 2;
+}
+  
+message ImageByNamespaceSet {
+    // @gotags: bson:"items" json:"items"
+    repeated string items = 1;
+}
+
+
+
+
+
+
+message CreateImageRequest{
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 1;
+    // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 2;
+
+          // 资源名称
+    // @gotags: bson:"name" json:"name"
+    string name =3;
+    // 资源ID
+    // @gotags: bson:"image_id" json:"image_id"
+    string image_id =4;
+    // 归属人
+    // @gotags: bson:"owner" json:"owner"
+    string owner =5;
+   
+}
+
+
+
+message QueryImageRequest {
+    // @gotags: json:"page"
+    infraboard.mcube.page.PageRequest page = 1;
+     // 设备分配的空间
+    // @gotags: bson:"namespace" json:"namespace"
+    string namespace = 2;
+    // 设备分配的域
+    // @gotags: bson:"domain" json:"domain"
+    string domain = 3;
+}
+
+
+
+
+message DeleteImagesRequest{
+
+     // @gotags: json:"image_ids"
+    repeated string image_ids = 1;
+}
+
+
+

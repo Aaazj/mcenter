@@ -44,7 +44,7 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Metadata(label.Allow, user.TYPE_SUPPER).
 		Metadata(label.Audit, true).
 		Metadata(label.Resource, h.Name()).
-		Metadata(label.Action, "AllocationDevice").
+		Metadata(label.Action, "Allocation").
 		Reads(device.AllocationRequest{}))
 
 	ws.Route(ws.GET("/").To(h.QueryDevice).
@@ -63,7 +63,7 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Metadata(label.Allow, user.TYPE_SUPPER).
 		Metadata(label.Audit, true).
 		Metadata(label.Resource, h.Name()).
-		Metadata(label.Action, "ReleaseDevices").
+		Metadata(label.Action, "Release").
 		Metadata(restfulspec.KeyOpenAPITags, tags))
 
 	ws.Route(ws.POST("/renewal").To(h.RenewalDevice).
@@ -72,7 +72,7 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Metadata(label.Allow, user.TYPE_SUPPER).
 		Metadata(label.Audit, true).
 		Metadata(label.Resource, h.Name()).
-		Metadata(label.Action, "RenewalDevice").
+		Metadata(label.Action, "Renewal").
 		Metadata(restfulspec.KeyOpenAPITags, tags))
 
 }

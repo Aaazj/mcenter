@@ -51,7 +51,7 @@ message DeviceEntry {
     // @gotags: bson:"name" json:"name"
     string name =1;
     // 资源ID
-    // @gotags: id:"name" json:"id"
+    // @gotags: bson:"id" json:"id"
     string id =2;
     // 设备分配时间
     // @gotags: bson:"allocate_days" json:"allocate_days"

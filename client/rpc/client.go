@@ -12,11 +12,11 @@ import (
 	"github.com/Aaazj/mcenter/apps/audit"
 	"github.com/Aaazj/mcenter/apps/device"
 	"github.com/Aaazj/mcenter/apps/endpoint"
+	"github.com/Aaazj/mcenter/apps/image"
 	"github.com/Aaazj/mcenter/apps/instance"
+	"github.com/Aaazj/mcenter/apps/line"
 	"github.com/Aaazj/mcenter/apps/namespace"
 
-	//"github.com/Aaazj/mcenter/apps/policy"
-	//"github.com/Aaazj/mcenter/apps/role"
 	"github.com/Aaazj/mcenter/apps/service"
 	"github.com/Aaazj/mcenter/apps/token"
 	"github.com/Aaazj/mcenter/apps/user"
@@ -119,21 +119,6 @@ func (c *ClientSet) Device() device.RPCClient {
 	return device.NewRPCClient(c.conn)
 }
 
-// // Notify服务的SDK
-// func (c *ClientSet) Notify() notify.RPCClient {
-// 	return notify.NewRPCClient(c.conn)
-// }
-
-// Role服务的SDK
-// func (c *ClientSet) Role() role.RPCClient {
-// 	return role.NewRPCClient(c.conn)
-// }
-
-// // Permission服务的SDK
-// func (c *ClientSet) Policy() policy.RPCClient {
-// 	return policy.NewRPCClient(c.conn)
-// }
-
 // Endpoint服务的SDK
 func (c *ClientSet) Endpoint() endpoint.RPCClient {
 	return endpoint.NewRPCClient(c.conn)
@@ -142,4 +127,12 @@ func (c *ClientSet) Endpoint() endpoint.RPCClient {
 // Audit服务的SDK
 func (c *ClientSet) Audit() audit.RPCClient {
 	return audit.NewRPCClient(c.conn)
+}
+
+func (c *ClientSet) Image() image.RPCClient {
+	return image.NewRPCClient(c.conn)
+}
+
+func (c *ClientSet) Line() line.RPCClient {
+	return line.NewRPCClient(c.conn)
 }

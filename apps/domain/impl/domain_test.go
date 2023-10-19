@@ -18,7 +18,7 @@ func TestQueryDoamin(t *testing.T) {
 func TestCreateDomain(t *testing.T) {
 	req := domain.NewCreateDomainRequest()
 	//req.Name = domain.DEFAULT_DOMAIN
-	req.Name = "chenggui"
+	req.Name = "chenggui2"
 	ins, err := impl.CreateDomain(ctx, req)
 	if err != nil {
 		t.Fatal(err)

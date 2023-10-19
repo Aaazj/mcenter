@@ -60,7 +60,6 @@ func (a *httpAuther) SetPermissionMode(m PermissionMode) {
 
 // 是否开启权限的控制, 交给中间件使用方去觉得
 func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Response, next *restful.FilterChain) {
-	fmt.Printf("\"GoRestfulAuthFuncGoRestfulAuthFuncGoRestfulAuthFuncGoRestfulAuthFunc\": %v\n", "GoRestfulAuthFuncGoRestfulAuthFuncGoRestfulAuthFuncGoRestfulAuthFunc")
 	res := conf.GeneralResponse{
 		Errcode: 0,
 		Errmsg:  "OK",
