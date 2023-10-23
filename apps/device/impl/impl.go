@@ -33,7 +33,7 @@ func (i *impl) Config() error {
 	if err != nil {
 		return err
 	}
-	//i.col = db.Collection(i.Name())
+
 	i.log = zap.L().Named(i.Name())
 
 	dc := db.Collection(i.Name())
