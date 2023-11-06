@@ -57,8 +57,8 @@ message AllocationResponse{
 // DescribeEndpointRequest todo
 message DescribeDeviceRequest {
       // 名称
-    // @gotags: json:"name"
-    string name = 1;
+    // @gotags: json:"id"
+    string id = 1;
 
 }
 
@@ -79,15 +79,15 @@ message QueryDeviceRequest {
 
 message ReleaseDevicesRequest{
 
-     // @gotags: json:"names"
-    repeated string names = 1;
+     // @gotags: json:"ids"
+    repeated string ids = 1;
 }
 
 
 message ValidateDeviceRequest{
 
-     // @gotags: json:"name"
-    string name = 1;
+     // @gotags: json:"id"
+    string id = 1;
 }
 
 
@@ -96,8 +96,8 @@ message DeviceRenewalRequest {
 
 
     // 资源名称
-    // @gotags: bson:"name" json:"name" validate:"required"
-    string name =1;
+    // @gotags: bson:"id" json:"id" validate:"required"
+    string id =1;
     // 设备分配时间
     // @gotags: bson:"renewal_time" json:"renewal_time" validate:"required"
     int64 RenewalTime =2;

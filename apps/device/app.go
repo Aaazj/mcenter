@@ -35,7 +35,7 @@ func (req *AllocationRequest) Devices() []*Device {
 		now := time.Now()
 		expiredAt := time.Unix(now.Unix(), 0).Add(time.Duration(req.Entries[i].AllocateDays) * time.Hour * 24)
 		ep := &Device{
-			Id:            GenHashID("device", req.Entries[i].Name),
+			Id:            GenHashID("device", req.Entries[i].Id),
 			CreateAt:      now.Unix(),
 			Domain:        req.Domain,
 			Namespace:     req.Namespace,
@@ -82,21 +82,21 @@ func NewDefaultDeviceRenewalRequest() *DeviceRenewalRequest {
 
 // Validate 校验注册请求合法性
 func (req *DeviceRenewalRequest) Validate() error {
-	if req.Name == "" {
-		return fmt.Errorf("must require device name")
+	if req.Id == "" {
+		return fmt.Errorf("must require device id")
 	}
 
 	return validate.Struct(req)
 }
 
-func NewDescriptDeviceRequestWithName(name string) *DescribeDeviceRequest {
-	return &DescribeDeviceRequest{Name: name}
+func NewDescriptDeviceRequestWithID(id string) *DescribeDeviceRequest {
+	return &DescribeDeviceRequest{Id: id}
 }
 
 // Validate 校验
 func (req *DescribeDeviceRequest) Validate() error {
-	if req.Name == "" {
-		return fmt.Errorf("device name is required")
+	if req.Id == "" {
+		return fmt.Errorf("device id is required")
 	}
 
 	return nil
@@ -123,9 +123,9 @@ func (x *Device) ValidateDevice() bool {
 
 }
 
-func NewReleaseDevicesRequestWithName() *ReleaseDevicesRequest {
+func NewReleaseDevicesRequestWithId() *ReleaseDevicesRequest {
 	return &ReleaseDevicesRequest{
-		Names: []string{},
+		Ids: []string{},
 	}
 }
 
@@ -135,8 +135,8 @@ func (m *ValidateDeviceRequest) Validate() error {
 		return err
 	}
 
-	if m.Name == "" {
-		return errors.New("device name required one")
+	if m.Id == "" {
+		return errors.New("device id required one")
 	}
 
 	return nil

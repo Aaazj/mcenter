@@ -180,6 +180,19 @@ func GetAccessTokenFromHTTP(r *http.Request) string {
 	return ck.Value
 }
 
+func GetAccessTokenFromSocket(r *restful.Request) string {
+
+	auth := r.HeaderParameter(ACCESS_TOKEN_HEADER_KEY_SOCKET)
+	if len(auth) < 7 {
+		return ""
+	}
+	//去掉Bearer
+	selectedAuth := auth[6:]
+
+	return selectedAuth
+
+}
+
 func NewValidateTokenRequest(accessToken string) *ValidateTokenRequest {
 	return &ValidateTokenRequest{
 		AccessToken: accessToken,

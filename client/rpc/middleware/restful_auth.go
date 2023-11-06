@@ -73,7 +73,7 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 		tk, err := a.CheckAccessToken(req)
 
 		if err != nil {
-			if err == token.ErrTokenExpoired {
+			if err.Error() == token.ErrTokenExpoired.Error() {
 
 				res.Errcode = 444
 				res.Errmsg = err.Error()
@@ -83,7 +83,8 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 				}
 				return
 			}
-			if err == token.ErrOtherPlaceLoggedIn {
+
+			if err.Error() == token.ErrOtherPlaceLoggedIn.Error() {
 
 				res.Errcode = 50010
 				res.Errmsg = err.Error()
@@ -158,6 +159,10 @@ func (a *httpAuther) GoRestfulAuthFunc(req *restful.Request, resp *restful.Respo
 func (a *httpAuther) CheckAccessToken(req *restful.Request) (*token.Token, error) {
 	// 获取用户Token, Token放在Heander Authorization
 	ak := token.GetAccessTokenFromHTTP(req.Request)
+
+	if ak == "" {
+		ak = token.GetAccessTokenFromSocket(req)
+	}
 
 	if ak == "" {
 		return nil, token.ErrUnauthorized

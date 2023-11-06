@@ -56,8 +56,9 @@ func (h *handler) ReleaseDevices(r *restful.Request, w *restful.Response) {
 		Errmsg:  "OK",
 	}
 
-	req := device.NewReleaseDevicesRequestWithName()
-
+	req := device.NewReleaseDevicesRequestWithId()
+	fmt.Printf("\"----------------------------------------\": %v\n", "----------------------------------------")
+	fmt.Printf("req: %v\n", req)
 	if err := request.GetDataFromRequest(r.Request, req); err != nil {
 
 		res.Errcode = 401001
@@ -119,7 +120,7 @@ func (u *handler) DescribeDevice(r *restful.Request, w *restful.Response) {
 		Errcode: 0,
 		Errmsg:  "OK",
 	}
-	req := device.NewDescriptDeviceRequestWithName(r.PathParameter("name"))
+	req := device.NewDescriptDeviceRequestWithID(r.PathParameter("id"))
 	ins, err := h.service.DescribeDevice(r.Request.Context(), req)
 	if err != nil {
 		//response.Failed(w, err)

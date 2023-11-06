@@ -22,8 +22,8 @@ type describeDeviceRequest struct {
 
 func (req *describeDeviceRequest) FindFilter() bson.M {
 	filter := bson.M{}
-	if req.Name != "" {
-		filter["name"] = req.Name
+	if req.Id != "" {
+		filter["id"] = req.Id
 	}
 
 	return filter

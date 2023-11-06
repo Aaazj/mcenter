@@ -43,7 +43,7 @@ func (i *impl) Config() error {
 		},
 		{
 			Keys: bsonx.Doc{
-				{Key: "name", Value: bsonx.Int32(-1)},
+				{Key: "id", Value: bsonx.Int32(-1)},
 			},
 			Options: options.Index().SetUnique(true),
 		},

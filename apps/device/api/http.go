@@ -52,9 +52,9 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata("action", "list"))
 
-	ws.Route(ws.GET("/{name}").To(h.DescribeDevice).
+	ws.Route(ws.GET("/{id}").To(h.DescribeDevice).
 		Doc("查询服务功能详情").
-		Param(ws.PathParameter("name", "name of the device").DataType("string")).
+		Param(ws.PathParameter("id", "id of the device").DataType("string")).
 		Metadata(restfulspec.KeyOpenAPITags, tags))
 
 	ws.Route(ws.DELETE("/").To(h.ReleaseDevices).

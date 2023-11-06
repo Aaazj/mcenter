@@ -24,18 +24,20 @@ func (s *impl) DescribeDevice(ctx context.Context, req *device.DescribeDeviceReq
 	ins := device.NewDefaultDevice()
 	if err := s.col.FindOne(ctx, r.FindFilter()).Decode(ins); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.NewNotFound("Device %s not found", req.Name)
+			return nil, exception.NewNotFound("Device %s not found", req.Id)
 		}
 
-		return nil, exception.NewInternalServerError("find Device %s error, %s", req.Name, err)
+		return nil, exception.NewInternalServerError("find Device %s error, %s", req.Id, err)
 	}
 
 	if !ins.ValidateDevice() { //过期  释放资源
-		_, err := s.col.DeleteOne(ctx, r.FindFilter())
+		//_, err := s.col.DeleteOne(ctx, r.FindFilter())
+		_, err := s.col.DeleteOne(ctx, bson.M{"id": ins.Entry.Id})
+
 		if err != nil {
-			return nil, exception.NewInternalServerError("device expired, delete device (%s)  error, %s", req.Name, err)
+			return nil, exception.NewInternalServerError("device expired, delete device (%s)  error, %s", req.Id, err)
 		}
-		return nil, exception.NewInternalServerError("device expired, delete device (%s) ", req.Name)
+		return nil, exception.NewInternalServerError("device expired, delete device (%s) ", req.Id)
 	} else {
 		if err := s.col.FindOneAndReplace(ctx, bson.M{"_id": ins.Id}, ins).Err(); err != nil {
 			klog.Error("device (%s)剩余时间更新失败", ins.Entry.Name)
@@ -64,7 +66,8 @@ func (s *impl) QueryDevice(ctx context.Context, req *device.QueryDeviceRequest) 
 		}
 
 		if !ins.ValidateDevice() { //过期  释放资源
-			_, err := s.col.DeleteOne(ctx, r.FindFilter())
+			//_, err := s.col.DeleteOne(ctx, r.FindFilter())
+			_, err := s.col.DeleteOne(ctx, bson.M{"id": ins.Entry.Id})
 			if err != nil {
 
 				klog.Error(exception.NewInternalServerError("device expired, delete device (%s)  error, %s", ins.Entry.Name, err))
@@ -102,7 +105,7 @@ func (s *impl) AllocationDevice(ctx context.Context, req *device.AllocationReque
 	for i := range devices {
 		set.Add(devices[i])
 		set.Total += 1
-		if err := s.col.FindOneAndReplace(ctx, bson.M{"_id": devices[i].Id}, devices[i]).Err(); err != nil {
+		if err := s.col.FindOneAndReplace(ctx, bson.M{"id": devices[i].Entry.Id}, devices[i]).Err(); err != nil {
 			if err == mongo.ErrNoDocuments {
 				news = append(news, devices[i])
 			} else {
@@ -127,22 +130,19 @@ func (s *impl) ReleaseDevices(ctx context.Context, req *device.ReleaseDevicesReq
 
 	var result *mongo.DeleteResult
 	var err error
-	if len(req.Names) == 1 {
-		result, err = s.col.DeleteMany(ctx, bson.M{"name": req.Names[0]})
+	if len(req.Ids) == 1 {
+		fmt.Printf("req.Ids[0]: %v\n", req.Ids[0])
+		result, err = s.col.DeleteMany(ctx, bson.M{"id": req.Ids[0]})
 	} else {
-		result, err = s.col.DeleteMany(ctx, bson.M{"name": bson.M{"$in": req.Names}})
+		result, err = s.col.DeleteMany(ctx, bson.M{"id": bson.M{"$in": req.Ids}})
 	}
-
-	// fmt.Printf("req.Names[0]: %v\n", req.Names[0])
-	// //_, err := s.col.DeleteMany(ctx, bson.M{"name": req.Names[0]})
-	// _, err := s.col.DeleteOne(ctx, bson.M{"name": req.Names[0]})
 	fmt.Printf("err: %v\n", err)
 	if err != nil {
-		return nil, exception.NewInternalServerError("delete device(%s) error, %s", req.Names[0], err)
+		return nil, exception.NewInternalServerError("delete device(%s) error, %s", req.Ids[0], err)
 	}
 	if result.DeletedCount == 0 {
 
-		return nil, exception.NewNotFound("device %s not found", req.Names)
+		return nil, nil
 	}
 	return nil, nil
 }
@@ -153,17 +153,17 @@ func (s *impl) ValidateDevice(ctx context.Context, req *device.ValidateDeviceReq
 		return nil, exception.NewBadRequest(err.Error())
 	}
 
-	device, err := s.get(ctx, req.Name)
+	device, err := s.get(ctx, req.Id)
 	if err != nil {
 		return nil, exception.NewUnauthorized(err.Error())
 	}
 
 	if !device.ValidateDevice() { //过期  释放资源
-		_, err := s.col.DeleteOne(ctx, bson.M{"name": device.Entry.Name})
+		_, err := s.col.DeleteOne(ctx, bson.M{"id": device.Entry.Id})
 		if err != nil {
-			return nil, exception.NewInternalServerError("device expired, delete device (%s)  error, %s", device.Entry.Name, err)
+			return nil, exception.NewInternalServerError("device expired, delete device (%s)  error, %s", device.Entry.Id, err)
 		}
-		return nil, exception.NewInternalServerError("device expired, delete device (%s) ", device.Entry.Name)
+		return nil, exception.NewInternalServerError("device expired, delete device (%s) ", device.Entry.Id)
 	}
 	return device, nil
 }
@@ -184,7 +184,8 @@ func (s *impl) QueryDeviceByNamespace(ctx context.Context, req *device.QueryDevi
 		}
 
 		if !ins.ValidateDevice() { //过期  释放资源
-			_, err := s.col.DeleteOne(ctx, req.FindFilter())
+
+			_, err := s.col.DeleteOne(ctx, bson.M{"id": ins.Entry.Id})
 			if err != nil {
 
 				klog.Error(exception.NewInternalServerError("device expired, delete device (%s)  error, %s", ins.Entry.Id, err))
@@ -193,7 +194,7 @@ func (s *impl) QueryDeviceByNamespace(ctx context.Context, req *device.QueryDevi
 			klog.Error(exception.NewInternalServerError("device expired, delete device (%s) ", ins.Entry.Id))
 
 		} else {
-			if err := s.col.FindOneAndReplace(ctx, bson.M{"_id": ins.Id}, ins).Err(); err != nil {
+			if err := s.col.FindOneAndReplace(ctx, bson.M{"id": ins.Entry.Id}, ins).Err(); err != nil {
 				klog.Error("device (%s)剩余时间更新失败", ins.Entry.Id)
 			}
 			set.Add(ins.Entry.Id)
@@ -209,12 +210,12 @@ func (s *impl) RenewalDevice(ctx context.Context, req *device.DeviceRenewalReque
 	}
 
 	ins := device.NewDefaultDevice()
-	if err := s.col.FindOne(ctx, bson.M{"name": req.Name}).Decode(ins); err != nil {
+	if err := s.col.FindOne(ctx, bson.M{"id": req.Id}).Decode(ins); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.NewNotFound("Device %s not found or Device expired", req.Name)
+			return nil, exception.NewNotFound("Device %s not found or Device expired", req.Id)
 		}
 
-		return nil, exception.NewInternalServerError("find Device %s error, %s", req.Name, err)
+		return nil, exception.NewInternalServerError("find Device %s error, %s", req.Id, err)
 	}
 	ins.Entry.AllocateDays += req.RenewalTime
 	expiredAt := time.Unix(ins.CreateAt, 0).Add(time.Duration(ins.Entry.AllocateDays) * time.Hour * 24)
@@ -222,14 +223,14 @@ func (s *impl) RenewalDevice(ctx context.Context, req *device.DeviceRenewalReque
 	ins.ExpiredDate = expiredAt.Format("2006-01-02 15:04:05")
 
 	if !ins.ValidateDevice() { //过期  释放资源
-		_, err := s.col.DeleteOne(ctx, bson.M{"name": req.Name})
+		_, err := s.col.DeleteOne(ctx, bson.M{"id": req.Id})
 		if err != nil {
-			return nil, exception.NewInternalServerError("device expired, delete device (%s)  error, %s", req.Name, err)
+			return nil, exception.NewInternalServerError("device expired, delete device (%s)  error, %s", req.Id, err)
 		}
-		return nil, exception.NewInternalServerError("device expired, delete device (%s) ", req.Name)
+		return nil, exception.NewInternalServerError("device expired, delete device (%s) ", req.Id)
 	} else {
 		if err := s.col.FindOneAndReplace(ctx, bson.M{"_id": ins.Id}, ins).Err(); err != nil {
-			klog.Error("device (%s)剩余时间更新失败", ins.Entry.Name)
+			klog.Error("device (%s)剩余时间更新失败", ins.Entry.Id)
 		}
 	}
 
